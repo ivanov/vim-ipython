@@ -15,6 +15,11 @@ execute, and also get back object introspection and word completions in
 Vim, like what you get with: ``object?<enter>`` and ``object.<tab>`` in
 IPython.
 
+As of 2011-07-28, this code requires a 4 line change to IPython trunk, which
+are in  `this pull request`_.
+
+.. _this pull request: https://github.com/ipython/ipython/pull/631
+
 -----------------
 Quickstart Guide:
 -----------------
