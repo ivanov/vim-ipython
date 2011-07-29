@@ -19,6 +19,21 @@
 python << EOF
 import time
 import vim
+import sys
+
+try:
+    sys.stdout.flush
+except AttributeError:
+    # IPython complains if stderr and stdout don't have flush
+    # this is fixed in newer version of Vim
+    class WithFlush(object):
+        def __init__(self,noflush):
+            self.write=noflush.write
+            self.writelines=noflush.writelines
+        def flush(self):pass
+    sys.stdout = WithFlush(sys.stdout)
+    sys.stderr = WithFlush(sys.stderr)
+
 from IPython.zmq.blockingkernelmanager import BlockingKernelManager
 
 from IPython.config.loader import KeyValueConfigLoader

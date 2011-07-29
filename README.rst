@@ -15,10 +15,11 @@ execute, and also get back object introspection and word completions in
 Vim, like what you get with: ``object?<enter>`` and ``object.<tab>`` in
 IPython.
 
-As of 2011-07-28, this code requires a 4 line change to IPython trunk, which
-are in  `this pull request`_.
+The big change from previous versions of ``ipy.vim`` is that it no longer 
+the old requires the brittle ipy_vimserver.py instantiation, and since 
+it uses just vim and python, it is platform independent (i.e. should work
+even on windows, unlike the previous \*nix only solution)
 
-.. _this pull request: https://github.com/ipython/ipython/pull/631
 
 -----------------
 Quickstart Guide:
