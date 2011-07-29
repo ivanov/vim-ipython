@@ -2,21 +2,24 @@
 vim-ipython
 ###########
 
-Vim integration for IPython 0.11+
-A two-way integration between Vim and IPython. 
+A two-way integration between Vim and IPython 0.11+
+
 author: Paul Ivanov (http://pirsquared.org)
+
 github: http://github.com/ivanov/vim-ipython
+
 demo: http://pirsquared.org/vim-ipython/
 
 Using this plugin, you can send lines or whole files for IPython to
 execute, and also get back object introspection and word completions in
-Vim, like what you get with: object?<enter> object.<tab> in IPython
+Vim, like what you get with: ``object?<enter>`` and ``object.<tab>`` in
+IPython.
 
 -----------------
 Quickstart Guide:
 -----------------
-Start ipython qtconsole and copy the connection string.
-Source ipy.vim file, which provides new IPython command::
+Start ``ipython qtconsole`` and copy the connection string.
+Source ``ipy.vim`` file, which provides new IPython command::
 
   :source ipy.vim  
   (or copy it to ~/.vim/ftplugin/python to load automatically)
@@ -28,23 +31,23 @@ The :IPython command allows you to put the full string, e.g.::
 
   :IPython --existing --shell=41882 --iopub=43286 --stdin=34987 --hb=36697
 
-The :IPythonClipboard command just uses the + register to get the connection
-string, whereas :IPythonXSelection uses the * register
+The ``:IPythonClipboard`` command just uses the ``+`` register to get the
+connection string, whereas ``:IPythonXSelection`` uses the ``*`` register
 
 ------------------------
 Sending lines to IPython
 ------------------------
-Now type out a line and send it to IPython using `<Ctrl-S>` from Command mode::
+Now type out a line and send it to IPython using ``<Ctrl-S>`` from Command mode::
 
   import os
 
 You should see a notification message confirming the line was sent, along
-with the input number for the line, like so `In[1]: import os`
+with the input number for the line, like so ``In[1]: import os``.
 
-Ctrl-S also works from insert mode, but doesn't show notification
+``<Ctrl-S>`` also works from insert mode, but doesn't show notification
 
 It also works blockwise in Visual Mode. Strip the leading double quotes and
-send these lines using `<Ctrl-S>`::
+send these lines using ``<Ctrl-S>``::
 
   import this,math # secret decoder ring
   a,b,c,d,e,f,g,h,i = range(1,10)
@@ -59,22 +62,23 @@ Then, go to the qtconsole and run this line::
   
   print secret_decoder(_i,_)
 
-You can also send whole files to IPython's `%run` magic using `<F5>`.
+You can also send whole files to IPython's ``%run`` magic using ``<F5>``.
 
 -------------------------------
 IPython's object? Functionality
 -------------------------------
 
 If you're using gvim, mouse-over a variable to see IPython's ? equivalent. If
-you're using vim from a terminal, or want to copy something from the docstring,
-type `<leader>d`. `<leader>` is usually `\` (the backslash key).  This will
-open a quickpreview window, which can be closed by hitting `q` or `<escape>`.
+you're using vim from a terminal, or want to copy something from the
+docstring, type ``<leader>d``. ``<leader>`` is usually ``\`` (the backslash
+key).  This will open a quickpreview window, which can be closed by hitting
+``q`` or ``<escape>``.
 
 --------------------------------------
 IPython's tab-completion Functionality
 --------------------------------------
 vim-ipython activates a 'completefunc' that queries IPython.
-A completefunc is activated using `Ctrl-X Ctrl-U` in Insert Mode (vim
+A completefunc is activated using ``Ctrl-X Ctrl-U`` in Insert Mode (vim
 default). You can combine this functionality with SuperTab to get tab
 completion 
 
