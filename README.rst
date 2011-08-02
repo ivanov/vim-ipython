@@ -18,8 +18,11 @@ IPython.
 The big change from previous versions of ``ipy.vim`` is that it no longer 
 the old requires the brittle ipy_vimserver.py instantiation, and since 
 it uses just vim and python, it is platform independent (i.e. should work
-even on windows, unlike the previous \*nix only solution)
+even on windows, unlike the previous \*nix only solution). The requirements
+are IPython 0.11+ with zeromq capabilities, vim compiled with +python.
 
+If you can launch ``ipython qtconsole`` and ``:echo has('python')`` returns 1
+in vim, you should be good to go.
 
 -----------------
 Quickstart Guide:
@@ -86,7 +89,31 @@ IPython's tab-completion Functionality
 vim-ipython activates a 'completefunc' that queries IPython.
 A completefunc is activated using ``Ctrl-X Ctrl-U`` in Insert Mode (vim
 default). You can combine this functionality with SuperTab to get tab
-completion 
+completion.
+
+-------------------
+vim-ipython 'shell'
+-------------------
+
+*new since IPython 0.11*!
+
+By monitoring km.sub_channel, we can recreate what messages were sent to
+IPython, and what IPython sends back in response. 
+
+``monitor_subchannel`` is a parameter that sets whether this 'shell' should
+update on every sent command (default: True).
+
+If at any later time you wish to bring this shell up, including if you've set
+``monitor_subchannel=False``, hit ``<leader>s``.
+
+-------
+Options
+-------
+You can change these at the top of the ipy.vim
+reselect = False            # reselect lines after sending from Visual mode
+show_execution_count = True # wait to get numbers for In[43]: feedback?
+monitor_subchannel = True   # update vim-ipython 'shell' on every send?
+run_flags= "-i"             # flags to for IPython's run magic when using <F5>
 
 ---------------
 Current issues:
@@ -98,8 +125,10 @@ own file and do a lazy import (only when the IPython command is called)
 
 The ipdb integration is not yet re-implemented.
 
-Need to add more message handling for sub_channel messages from IPython
-(i.e. notification of changes which were not sent from vim).
+Unicode support - if you have a unicode file and you type ls, vim has trouble
+processing that message.
+
+Also, I've seen other sporadic unicode related errors.
 
 ------
 Thanks

@@ -17,6 +17,11 @@
 "
 " written by Paul Ivanov (http://pirsquared.org)
 python << EOF
+reselect = False            # reselect lines after sending from Visual mode
+show_execution_count = True # wait to get numbers for In[43]: feedback?
+monitor_subchannel = True   # update vim-ipython 'shell' on every send?
+run_flags= "-i"             # flags to for IPython's run magic when using <F5>
+
 import time
 import vim
 import sys
@@ -70,9 +75,6 @@ def km_from_string(s):
     return km
 
 
-reselect = False
-show_id= True
-run_flags= "-i"
 
 def echo(arg,style="Question"):
     try:
@@ -91,9 +93,9 @@ def get_doc(word):
     msg_id = km.shell_channel.object_info(word)
     time.sleep(.1)
     doc = get_doc_msg(msg_id)
-    #if len(doc):
-    #    echo(word, 'Special')
-    return doc
+    # get around unicode problems when interfacing with vim
+    encoding=vim.eval('&encoding')
+    return [d.encode(encoding) for d in doc]
 
 import re
 # from http://serverfault.com/questions/71285/in-centos-4-4-how-can-i-strip-escape-sequences-from-a-text-file
@@ -109,14 +111,6 @@ def get_doc_msg(msg_id):
 
     if not content['found']:
         return b
-
-    ## debugging the whole message
-    #for k in content:
-    #    if isinstance(content[k],str) and content[k].find('\n')!=-1:
-    #        b.append(k.ljust(n)+":")
-    #        b.append(content[k].splitlines())
-    #    else:
-    #        b.append(k.ljust(n)+":"+str(content[k]))
 
     for field in ['type_name','base_class','string_form','namespace',
             'file','length','definition','source','docstring']:
@@ -143,11 +137,13 @@ def get_doc_buffer(level=0):
     vim.command('pcl')
     vim.command('new '+word)
     vim.command('setlocal pvw modifiable noro')
+    # doc window quick quit keys: 'q' and 'escape'
     vim.command('map <buffer> q :q<CR>')
     vim.command('map <buffer>  :q<CR>')
     #vim.command('pedit '+docbuf.name)
     b = vim.current.buffer
     #b.append(doc)
+    b[:] = None
     b[:] = doc
     #b.append(doc)
     vim.command('setlocal nomodified bufhidden=wipe')
@@ -158,6 +154,64 @@ def get_doc_buffer(level=0):
     #vim.command('pedit doc')
     #vim.command('normal ') # go to previous window
 
+def update_subchannel_msgs(debug=True):
+    msgs = km.sub_channel.get_msgs()
+    if debug:
+        #try:
+        #    vim.command("b debug_msgs")
+        #except vim.error:
+        #    vim.command("new debug_msgs")
+        #finally:
+        db = vim.current.buffer
+    else:
+        db = []
+    vim.command("pcl")
+    vim.command("pedit vim-ipython")
+    vim.command("normal P") #switch to preview window
+    # subchannel window quick quit key 'q'
+    vim.command('map <buffer> q :q<CR>')
+    vim.command("set bufhidden=hide buftype=nofile ft=python")
+    
+    #syntax highlighting for python prompt
+    # QtConsole In[] is blue, but I prefer the oldschool green
+    # since it makes the vim-ipython 'shell' look like the holidays!
+    #vim.command("hi Blue ctermfg=Blue guifg=Blue")
+    vim.command("hi Green ctermfg=Green guifg=Green")
+    vim.command("hi Red ctermfg=Red guifg=Red")
+    vim.command("syn keyword Green 'In\ []:'")
+    vim.command("syn match Green /^In \[[0-9]*\]\:/")
+    vim.command("syn match Red /^Out\[[0-9]*\]\:/")
+    b = vim.current.buffer
+    for m in msgs:
+        db.append(str(m).splitlines())
+        if m['msg_type'] == 'status':
+            continue
+        if m['msg_type'] == 'stream':
+            s = strip_color_escapes(m['content']['data'])
+        if m['msg_type'] == 'pyout':
+            s = "Out[%d]: " % m['content']['execution_count']
+            s += m['content']['data']['text/plain']
+        if m['msg_type'] == 'pyin':
+            s = "\nIn []: "
+            s += m['content']['code'].strip()
+        if m['msg_type'] == 'pyerr':
+            c = m['content']
+            s = "\n".join(map(strip_color_escapes,c['traceback']))
+            s += c['ename'] + ":" + c['evalue']
+        if s.find('\n')==-1:
+            # somewhat ugly unicode workaround from http://vim.1045645.n5.nabble.com/Limitations-of-vim-python-interface-with-respect-to-character-encodings-td1223881.html
+            if isinstance(s,unicode):
+                s=s.encode(vim.eval("&encoding"))
+            b.append(s)
+        else:
+            try:
+                b.append(s.splitlines())
+            except:
+                encoding = vim.eval("&encoding")
+                b.append([l.encode(encoding) for l in s.splitlines()])
+    vim.command('normal G') # go to the end of the file
+    vim.command('e #|pedit vim-ipython')
+    
 def get_child_msgs(msg_id):
     # XXX: message handling should be split into its own process in the future
     msgs= km.shell_channel.get_msgs()
@@ -171,8 +225,8 @@ def run_this_file():
     echo("In[]: run %s %s" % (run_flags, vim.current.buffer.name))
 
 def print_prompt(prompt,msg_id=None):
-    global show_id
-    if show_id and msg_id:
+    global show_execution_count
+    if show_execution_count and msg_id:
         time.sleep(.1) # wait to get message back from kernel
         children = get_child_msgs(msg_id)
         if len(children):
@@ -183,10 +237,20 @@ def print_prompt(prompt,msg_id=None):
     else:
         echo("In[]: %s" % prompt)
 
+def with_subchannel(f):
+    "conditionally monitor subchannel"
+    def f_with_update():
+        f()
+        if monitor_subchannel:
+            update_subchannel_msgs()
+            vim.command('normal p') # go back to where you were
+    return f_with_update
+@with_subchannel
 def run_this_line():
     msg_id = send(vim.current.line)
     print_prompt(vim.current.line, msg_id)
 
+@with_subchannel
 def run_these_lines():
     r = vim.current.range
     lines = "\n".join(vim.current.buffer[r.start:r.end+1])
@@ -266,6 +330,7 @@ map <silent> <F5> :python run_this_file()<CR>
 map <silent> <S-F5> :python run_this_line()<CR>
 map <silent> <F9> :python run_these_lines()<CR>
 map <leader>d :py get_doc_buffer()<CR>
+map <leader>s :py update_subchannel_msgs()<CR>
 map <silent> <S-F9> :python toggle_reselect()<CR>
 "map <silent> <C-F6> :python send('%pdb')<CR>
 "map <silent> <F6> :python set_breakpoint()<CR>
@@ -298,7 +363,6 @@ function! IPythonBalloonExpr()
 python << endpython
 word = vim.eval('v:beval_text')
 reply = get_doc(word)
-#reply = reply[:40]
 vim.command("let l:doc = %s"% reply)
 endpython
 return l:doc
@@ -325,11 +389,15 @@ findstart = vim.eval("a:findstart")
 msg_id = km.shell_channel.complete(base, vim.current.line, vim.eval("col('.')"))
 time.sleep(.1)
 m = get_child_msgs(msg_id)[0]
-
+# get rid of unicode (sporadic issue, haven't tracked down when it happens)
+#matches = [str(u) for u in m['content']['matches']]
+# mirk sez do: completion_str = '[' + ', '.join(msg['content']['matches'] ) + ']'
+# because str() won't work for non-ascii characters
 matches = m['content']['matches']
 #end = len(base)
 #completions = [m[end:]+findstart+base for m in matches]
 matches.insert(0,base) # the "no completion" version
+#echo(str(matches))
 completions = matches
 vim.command("let l:completions = %s"% completions)
 endpython
