@@ -280,6 +280,7 @@ map <C-F5> :call <SID>toggle_send_on_save()<CR>
 "pi custom
 map <silent> <C-Return> :python run_this_file()<CR>
 map <silent> <C-s> :python run_this_line()<CR>
+imap <silent> <C-s> <C-O>:python run_this_line()<CR>
 map <silent> <M-s> :python dedent_run_this_line()<CR>
 vmap <silent> <C-S> :python run_these_lines()<CR>
 vmap <silent> <M-s> :python dedent_run_these_lines()<CR>
