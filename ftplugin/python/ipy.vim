@@ -154,7 +154,7 @@ def get_doc_buffer(level=0):
     #vim.command('pedit doc')
     #vim.command('normal ') # go to previous window
 
-def update_subchannel_msgs(debug=True):
+def update_subchannel_msgs(debug=False):
     msgs = km.sub_channel.get_msgs()
     if debug:
         #try:
@@ -166,7 +166,7 @@ def update_subchannel_msgs(debug=True):
     else:
         db = []
     vim.command("pcl")
-    vim.command("pedit vim-ipython")
+    vim.command("silent pedit vim-ipython")
     vim.command("normal P") #switch to preview window
     # subchannel window quick quit key 'q'
     vim.command('map <buffer> q :q<CR>')
@@ -210,7 +210,7 @@ def update_subchannel_msgs(debug=True):
                 encoding = vim.eval("&encoding")
                 b.append([l.encode(encoding) for l in s.splitlines()])
     vim.command('normal G') # go to the end of the file
-    vim.command('e #|pedit vim-ipython')
+    vim.command('silent e #|silent pedit vim-ipython')
     
 def get_child_msgs(msg_id):
     # XXX: message handling should be split into its own process in the future

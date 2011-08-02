@@ -53,7 +53,9 @@ Now type out a line and send it to IPython using ``<Ctrl-S>`` from Command mode:
 You should see a notification message confirming the line was sent, along
 with the input number for the line, like so ``In[1]: import os``.
 
-``<Ctrl-S>`` also works from insert mode, but doesn't show notification
+``<Ctrl-S>`` also works from insert mode, but doesn't show notification,
+unless ``monitor_subchannel`` is set to ``True`` (see `vim-ipython 'shell'`_,
+below)
 
 It also works blockwise in Visual Mode. Strip the leading double quotes and
 send these lines using ``<Ctrl-S>``::
@@ -95,13 +97,13 @@ completion.
 vim-ipython 'shell'
 -------------------
 
-*new since IPython 0.11*!
+*NEW since IPython 0.11*!
 
 By monitoring km.sub_channel, we can recreate what messages were sent to
 IPython, and what IPython sends back in response. 
 
 ``monitor_subchannel`` is a parameter that sets whether this 'shell' should
-update on every sent command (default: True).
+updated on every sent command (default: True).
 
 If at any later time you wish to bring this shell up, including if you've set
 ``monitor_subchannel=False``, hit ``<leader>s``.
@@ -125,10 +127,7 @@ own file and do a lazy import (only when the IPython command is called)
 
 The ipdb integration is not yet re-implemented.
 
-Unicode support - if you have a unicode file and you type ls, vim has trouble
-processing that message.
-
-Also, I've seen other sporadic unicode related errors.
+There were some unicode errors, but they should all be fixed now.
 
 ------
 Thanks
