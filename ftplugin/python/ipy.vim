@@ -90,6 +90,8 @@ def disconnect():
     pass
 
 def get_doc(word):
+    if km is None:
+        return ["Not connected to IPython, cannot query \"%s\"" %word]
     msg_id = km.shell_channel.object_info(word)
     time.sleep(.1)
     doc = get_doc_msg(msg_id)
@@ -105,8 +107,7 @@ def strip_color_escapes(s):
     
 def get_doc_msg(msg_id):
     content = get_child_msgs(msg_id)[0]['content']
-    n = 13 # longest field name
-    ##XXX: debug (print the whole message)
+    n = 13 # longest field name (empirically)
     b=[]
 
     if not content['found']:
@@ -114,7 +115,6 @@ def get_doc_msg(msg_id):
 
     for field in ['type_name','base_class','string_form','namespace',
             'file','length','definition','source','docstring']:
-        # XXX: strip the 'definition' rich formatting
         c = content.get(field,None)
         if c:
             if field in ['definition']:
@@ -218,13 +218,8 @@ def get_child_msgs(msg_id):
     children = [m for m in msgs if m['parent_header']['msg_id'] == msg_id]
     return children
             
-
-
-def run_this_file():
-    send('run %s %s' % (run_flags, vim.current.buffer.name,))
-    echo("In[]: run %s %s" % (run_flags, vim.current.buffer.name))
-
 def print_prompt(prompt,msg_id=None):
+    """Print In[] or In[42] style messages"""
     global show_execution_count
     if show_execution_count and msg_id:
         time.sleep(.1) # wait to get message back from kernel
@@ -240,11 +235,20 @@ def print_prompt(prompt,msg_id=None):
 def with_subchannel(f):
     "conditionally monitor subchannel"
     def f_with_update():
-        f()
-        if monitor_subchannel:
-            update_subchannel_msgs()
-            vim.command('normal p') # go back to where you were
+        try:
+            f()
+            if monitor_subchannel:
+                update_subchannel_msgs()
+                vim.command('normal p') # go back to where you were
+        except AttributeError: #if km is None
+            echo("not connected to IPython", 'Error')
     return f_with_update
+
+@with_subchannel
+def run_this_file():
+    msg_id = send('run %s %s' % (run_flags, vim.current.buffer.name,))
+    print_prompt("In[]: run %s %s" % (run_flags, vim.current.buffer.name),msg_id)
+
 @with_subchannel
 def run_this_line():
     msg_id = send(vim.current.line)

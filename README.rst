@@ -8,7 +8,9 @@ author: Paul Ivanov (http://pirsquared.org)
 
 github: http://github.com/ivanov/vim-ipython
 
-demo: http://pirsquared.org/vim-ipython/
+demos: http://pirsquared.org/vim-ipython/
+
+blogpost: http://pirsquared.org/blog/2011/07/28/vim-ipython/
 
 Using this plugin, you can send lines or whole files for IPython to
 execute, and also get back object introspection and word completions in
@@ -111,11 +113,11 @@ If at any later time you wish to bring this shell up, including if you've set
 -------
 Options
 -------
-You can change these at the top of the ipy.vim
-reselect = False            # reselect lines after sending from Visual mode
-show_execution_count = True # wait to get numbers for In[43]: feedback?
-monitor_subchannel = True   # update vim-ipython 'shell' on every send?
-run_flags= "-i"             # flags to for IPython's run magic when using <F5>
+You can change these at the top of the ipy.vim::
+  reselect = False            # reselect lines after sending from Visual mode
+  show_execution_count = True # wait to get numbers for In[43]: feedback?
+  monitor_subchannel = True   # update vim-ipython 'shell' on every send?
+  run_flags= "-i"             # flags to for IPython's run magic when using <F5>
 
 ---------------
 Current issues:
@@ -128,6 +130,12 @@ own file and do a lazy import (only when the IPython command is called)
 The ipdb integration is not yet re-implemented.
 
 There were some unicode errors, but they should all be fixed now.
+
+If you're running inside ``screen``, read about the ``<CTRL-S>`` issue here_,
+and add this line to your ``.bashrc`` to fix it:: 
+    stty stop undef # to unmap ctrl-s 
+
+_here: http://munkymorgy.blogspot.com/2008/07/screen-ctrl-s-bug.html
 
 ------
 Thanks
