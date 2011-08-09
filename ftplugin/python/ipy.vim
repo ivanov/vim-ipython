@@ -222,6 +222,7 @@ def get_child_msg(msg_id):
         if m['parent_header']['msg_id'] == msg_id:
             break
         else:
+            #got a message, but not the one we were looking for
             echo('skipping a message on shell_channel','WarningMsg')
     return m
             
@@ -378,8 +379,10 @@ vim.command("let l:doc = %s"% reply)
 endpython
 return l:doc
 endfunction
-set bexpr=IPythonBalloonExpr()
-set ballooneval
+if has('balloon_eval')
+    set bexpr=IPythonBalloonExpr()
+    set ballooneval
+endif
 
 fun! CompleteIPython(findstart, base)
 	  if a:findstart
