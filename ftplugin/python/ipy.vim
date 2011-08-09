@@ -22,7 +22,6 @@ show_execution_count = True # wait to get numbers for In[43]: feedback?
 monitor_subchannel = True   # update vim-ipython 'shell' on every send?
 run_flags= "-i"             # flags to for IPython's run magic when using <F5>
 
-import time
 import vim
 import sys
 
@@ -39,7 +38,7 @@ except AttributeError:
     sys.stdout = WithFlush(sys.stdout)
     sys.stderr = WithFlush(sys.stderr)
 
-from IPython.zmq.blockingkernelmanager import BlockingKernelManager
+from IPython.zmq.blockingkernelmanager import BlockingKernelManager, Empty
 
 from IPython.config.loader import KeyValueConfigLoader
 from IPython.zmq.kernelapp import kernel_aliases
@@ -93,7 +92,6 @@ def get_doc(word):
     if km is None:
         return ["Not connected to IPython, cannot query \"%s\"" %word]
     msg_id = km.shell_channel.object_info(word)
-    time.sleep(.1)
     doc = get_doc_msg(msg_id)
     # get around unicode problems when interfacing with vim
     encoding=vim.eval('&encoding')
@@ -106,9 +104,13 @@ def strip_color_escapes(s):
     return strip.sub('',s)
     
 def get_doc_msg(msg_id):
-    content = get_child_msgs(msg_id)[0]['content']
     n = 13 # longest field name (empirically)
     b=[]
+    try:
+        content = get_child_msg(msg_id)['content']
+    except Empty:
+        # timeout occurred
+        return ["no reply from IPython kernel"]
 
     if not content['found']:
         return b
@@ -212,23 +214,28 @@ def update_subchannel_msgs(debug=False):
     vim.command('normal G') # go to the end of the file
     vim.command('silent e #|silent pedit vim-ipython')
     
-def get_child_msgs(msg_id):
+def get_child_msg(msg_id):
     # XXX: message handling should be split into its own process in the future
-    msgs= km.shell_channel.get_msgs()
-    children = [m for m in msgs if m['parent_header']['msg_id'] == msg_id]
-    return children
+    while True:
+        # geT_msg will raise with Empty exception if no messages arrive in 1 second
+        m= km.shell_channel.get_msg(timeout=1)
+        if m['parent_header']['msg_id'] == msg_id:
+            break
+        else:
+            echo('skipping a message on shell_channel','WarningMsg')
+    return m
             
 def print_prompt(prompt,msg_id=None):
     """Print In[] or In[42] style messages"""
     global show_execution_count
     if show_execution_count and msg_id:
-        time.sleep(.1) # wait to get message back from kernel
-        children = get_child_msgs(msg_id)
-        if len(children):
-            count = children[0]['content']['execution_count']
+        # wait to get message back from kernel
+        try:
+            child = get_child_msg(msg_id)
+            count = child['content']['execution_count']
             echo("In[%d]: %s" %(count,prompt))
-        else:
-            echo("In[]: %s (no reply from kernel)" % prompt)
+        except Empty:
+            echo("In[]: %s (no reply from IPython kernel)" % prompt)
     else:
         echo("In[]: %s" % prompt)
 
@@ -391,18 +398,21 @@ fun! CompleteIPython(findstart, base)
 base = vim.eval("a:base")
 findstart = vim.eval("a:findstart")
 msg_id = km.shell_channel.complete(base, vim.current.line, vim.eval("col('.')"))
-time.sleep(.1)
-m = get_child_msgs(msg_id)[0]
-# get rid of unicode (sporadic issue, haven't tracked down when it happens)
-#matches = [str(u) for u in m['content']['matches']]
-# mirk sez do: completion_str = '[' + ', '.join(msg['content']['matches'] ) + ']'
-# because str() won't work for non-ascii characters
-matches = m['content']['matches']
-#end = len(base)
-#completions = [m[end:]+findstart+base for m in matches]
-matches.insert(0,base) # the "no completion" version
-#echo(str(matches))
-completions = matches
+try:
+    m = get_child_msg(msg_id)
+    # get rid of unicode (sporadic issue, haven't tracked down when it happens)
+    #matches = [str(u) for u in m['content']['matches']]
+    # mirk sez do: completion_str = '[' + ', '.join(msg['content']['matches'] ) + ']'
+    # because str() won't work for non-ascii characters
+    matches = m['content']['matches']
+    #end = len(base)
+    #completions = [m[end:]+findstart+base for m in matches]
+    matches.insert(0,base) # the "no completion" version
+    #echo(str(matches))
+    completions = matches
+except Empty:
+    echo("no reply from IPython kernel")
+    completions=['']
 vim.command("let l:completions = %s"% completions)
 endpython
 	    for m in l:completions
