@@ -4,13 +4,10 @@ vim-ipython
 
 A two-way integration between Vim and IPython 0.11+
 
-author: Paul Ivanov (http://pirsquared.org)
-
-github: http://github.com/ivanov/vim-ipython
-
-demos: http://pirsquared.org/vim-ipython/
-
-blogpost: http://pirsquared.org/blog/2011/07/28/vim-ipython/
+* author: Paul Ivanov (http://pirsquared.org)
+* github: http://github.com/ivanov/vim-ipython
+* demos: http://pirsquared.org/vim-ipython/
+* blogpost: http://pirsquared.org/blog/2011/07/28/vim-ipython/
 
 Using this plugin, you can send lines or whole files for IPython to
 execute, and also get back object introspection and word completions in
@@ -59,8 +56,8 @@ with the input number for the line, like so ``In[1]: import os``.
 unless ``monitor_subchannel`` is set to ``True`` (see `vim-ipython 'shell'`_,
 below)
 
-It also works blockwise in Visual Mode. Strip the leading double quotes and
-send these lines using ``<Ctrl-S>``::
+It also works blockwise in Visual Mode. Select and send these lines using
+``<Ctrl-S>``::
 
   import this,math # secret decoder ring
   a,b,c,d,e,f,g,h,i = range(1,10)
@@ -98,8 +95,7 @@ completion.
 -------------------
 vim-ipython 'shell'
 -------------------
-
-*NEW since IPython 0.11*!
+**NEW since IPython 0.11**!
 
 By monitoring km.sub_channel, we can recreate what messages were sent to
 IPython, and what IPython sends back in response. 
@@ -123,31 +119,32 @@ You can change these at the top of the ipy.vim::
 ---------------
 Current issues:
 ---------------
-For now, vim-ipython only connects to an ipython session in progress.
-
-The ipdb integration is not yet re-implemented.
-
-There were some unicode errors, but they should all be fixed now.
-
-If you're running inside ``screen``, read about the ``<CTRL-S>`` issue 
-`here <http://munkymorgy.blogspot.com/2008/07/screen-ctrl-s-bug.html>`_,
-and add this line to your ``.bashrc`` to fix it:: 
+- For now, vim-ipython only connects to an ipython session in progress.
+- The ipdb integration is not yet re-implemented.
+- If you're running inside ``screen``, read about the ``<CTRL-S>`` issue `here
+  <http://munkymorgy.blogspot.com/2008/07/screen-ctrl-s-bug.html>`_, and add
+  this line to your ``.bashrc`` to fix it:: 
 
     stty stop undef # to unmap ctrl-s 
 
-In vim, if you're getting 
-``ImportError: No module named IPython.zmq.blockingkernelmanager``
-but are able to import it in regular python, *either* your 
-``sys.path`` in vim differs from the ``sys.path`` in regular python. Try
-running these two lines, and comparing their output files:
-``vim -c 'py import vim, sys; vim.current.buffer.append(sys.path)' -c':wq vim_syspath'`` 
-and
-``python -c "import sys; f=file('python_syspath','w'); f.write('\n'.join(sys.path)); f.close()"``
-*or* your vim is compiled
-against a different python than you are launching (see if there's a difference
-between ``:py import os; print os.__file__`` in vim with the same commands in
-python).
+- In vim, if you're getting ``ImportError: No module named
+  IPython.zmq.blockingkernelmanager`` but are able to import it in regular
+  python, **either**
 
+  1. your ``sys.path`` in vim differs from the ``sys.path`` in regular python.
+     Try running these two lines, and comparing their output files::
+  
+      $ vim -c 'py import vim, sys; vim.current.buffer.append(sys.path)' -c ':wq vim_syspath'
+      $ python -c "import sys; f=file('python_syspath','w'); f.write('\n'.join(sys.path)); f.close()"
+  
+  **or**
+
+  2. your vim is compiled against a different python than you are launching (see
+     if there's a difference between ::
+  
+      $ vim -c ':py import os; print os.__file__' -c ':q'
+      $ python -c ':py import os; print os.__file__'
+  
 ------
 Thanks
 ------
