@@ -18,7 +18,7 @@ Vim, like what you get with: ``object?<enter>`` and ``object.<tab>`` in
 IPython.
 
 The big change from previous versions of ``ipy.vim`` is that it no longer 
-the old requires the brittle ipy_vimserver.py instantiation, and since 
+the old requires the brittle ``ipy_vimserver.py`` instantiation, and since 
 it uses just vim and python, it is platform independent (i.e. should work
 even on windows, unlike the previous \*nix only solution). The requirements
 are IPython 0.11+ with zeromq capabilities, vim compiled with +python.
@@ -114,6 +114,7 @@ If at any later time you wish to bring this shell up, including if you've set
 Options
 -------
 You can change these at the top of the ipy.vim::
+
   reselect = False            # reselect lines after sending from Visual mode
   show_execution_count = True # wait to get numbers for In[43]: feedback?
   monitor_subchannel = True   # update vim-ipython 'shell' on every send?
@@ -131,13 +132,27 @@ The ipdb integration is not yet re-implemented.
 
 There were some unicode errors, but they should all be fixed now.
 
-If you're running inside ``screen``, read about the ``<CTRL-S>`` issue here_,
+If you're running inside ``screen``, read about the ``<CTRL-S>`` issue 
+`here <http://munkymorgy.blogspot.com/2008/07/screen-ctrl-s-bug.html>`_,
 and add this line to your ``.bashrc`` to fix it:: 
+
     stty stop undef # to unmap ctrl-s 
 
-_here: http://munkymorgy.blogspot.com/2008/07/screen-ctrl-s-bug.html
+In vim, if you're getting 
+``ImportError: No module named IPython.zmq.blockingkernelmanager``
+but are able to import it in regular python, *either* your 
+``sys.path`` in vim differs from the ``sys.path`` in regular python. Try
+running these two lines, and comparing their output files:
+``vim -c 'py import vim, sys; vim.current.buffer.append(sys.path)' -c':wq vim_syspath'`` 
+and
+``python -c "import sys; f=file('python_syspath','w'); f.write('\n'.join(sys.path)); f.close()"``
+*or* your vim is compiled
+against a different python than you are launching (see if there's a difference
+between ``:py import os; print os.__file__`` in vim with the same commands in
+python).
 
 ------
 Thanks
 ------
-@MinRK for guiding me through the IPython kernel manager protocol.
+* @MinRK for guiding me through the IPython kernel manager protocol.
+* @nakamuray and @tcheneau for reporting and providing a fix for when vim is compiled without a gui
