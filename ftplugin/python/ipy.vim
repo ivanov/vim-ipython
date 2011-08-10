@@ -38,10 +38,6 @@ except AttributeError:
     sys.stdout = WithFlush(sys.stdout)
     sys.stderr = WithFlush(sys.stderr)
 
-from IPython.zmq.blockingkernelmanager import BlockingKernelManager, Empty
-
-from IPython.config.loader import KeyValueConfigLoader
-from IPython.zmq.kernelapp import kernel_aliases
 
 
 ip = '127.0.0.1'
@@ -54,7 +50,10 @@ def km_from_string(s):
     """create kernel manager from IPKernelApp string
     such as '--shell=47378 --iopub=39859 --stdin=36778 --hb=52668'
     """
-    global km,send
+    from IPython.zmq.blockingkernelmanager import BlockingKernelManager, Empty
+    from IPython.config.loader import KeyValueConfigLoader
+    from IPython.zmq.kernelapp import kernel_aliases
+    global km,send,Empty
     # vim interface currently only deals with existing kernels
     s = s.replace('--existing','')
     loader = KeyValueConfigLoader(s.split(), aliases=kernel_aliases)
@@ -72,8 +71,6 @@ def km_from_string(s):
     km.start_channels()
     send = km.shell_channel.execute
     return km
-
-
 
 def echo(arg,style="Question"):
     try:
@@ -131,7 +128,8 @@ def get_doc_msg(msg_id):
     return b
 
 def get_doc_buffer(level=0):
-    word = vim.eval('expand("<cfile>")')
+    # empty string in case vim.eval return None
+    word = vim.eval('expand("<cfile>")') or ''
     doc = get_doc(word)
     if len(doc) ==0:
         echo(word+" not found","Error")
@@ -142,12 +140,9 @@ def get_doc_buffer(level=0):
     # doc window quick quit keys: 'q' and 'escape'
     vim.command('map <buffer> q :q<CR>')
     vim.command('map <buffer>  :q<CR>')
-    #vim.command('pedit '+docbuf.name)
     b = vim.current.buffer
-    #b.append(doc)
     b[:] = None
     b[:] = doc
-    #b.append(doc)
     vim.command('setlocal nomodified bufhidden=wipe')
     #vim.command('setlocal previewwindow nomodifiable nomodified ro')
     #vim.command('set previewheight=%d'%len(b))# go to previous window
@@ -217,7 +212,7 @@ def update_subchannel_msgs(debug=False):
 def get_child_msg(msg_id):
     # XXX: message handling should be split into its own process in the future
     while True:
-        # geT_msg will raise with Empty exception if no messages arrive in 1 second
+        # get_msg will raise with Empty exception if no messages arrive in 1 second
         m= km.shell_channel.get_msg(timeout=1)
         if m['parent_header']['msg_id'] == msg_id:
             break
@@ -293,7 +288,7 @@ def dedent_run_these_lines():
     
 #def set_this_line():
 #    # not sure if there's a way to do this, since we have multiple clients
-#    send("_ip.IP.rl_next_input= \'%s\'" % vim.current.line.replace("\'","\\\'"))
+#    send("get_ipython().shell.set_next_input(\'%s\')" % vim.current.line.replace("\'","\\\'"))
 #    #print "line \'%s\' set at ipython prompt"% vim.current.line
 #    echo("line \'%s\' set at ipython prompt"% vim.current.line,'Statement')
 
@@ -341,8 +336,8 @@ endfun
 map <silent> <F5> :python run_this_file()<CR>
 map <silent> <S-F5> :python run_this_line()<CR>
 map <silent> <F9> :python run_these_lines()<CR>
-map <leader>d :py get_doc_buffer()<CR>
-map <leader>s :py update_subchannel_msgs()<CR>
+map <silent> <leader>d :py get_doc_buffer()<CR>
+map <silent> <leader>s :py update_subchannel_msgs()<CR>
 map <silent> <S-F9> :python toggle_reselect()<CR>
 "map <silent> <C-F6> :python send('%pdb')<CR>
 "map <silent> <F6> :python set_breakpoint()<CR>
@@ -361,7 +356,7 @@ imap <silent> <C-s> <C-O>:python run_this_line()<CR>
 map <silent> <M-s> :python dedent_run_this_line()<CR>
 vmap <silent> <C-S> :python run_these_lines()<CR>
 vmap <silent> <M-s> :python dedent_run_these_lines()<CR>
-"map <silent> <C-p> :python set_this_line()<CR>
+map <silent> <C-p> :python set_this_line()<CR>
 map <silent> <M-c> I#<ESC>
 vmap <silent> <M-c> I#<ESC>
 map <silent> <M-C> :s/^\([ \t]*\)#/\1/<CR>

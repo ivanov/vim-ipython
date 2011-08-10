@@ -125,9 +125,6 @@ Current issues:
 ---------------
 For now, vim-ipython only connects to an ipython session in progress.
 
-ipy.vim takes a while to load, I'll eventually move the python code to its
-own file and do a lazy import (only when the IPython command is called)
-
 The ipdb integration is not yet re-implemented.
 
 There were some unicode errors, but they should all be fixed now.
