@@ -25,6 +25,9 @@ run_flags= "-i"             # flags to for IPython's run magic when using <F5>
 import vim
 import sys
 
+# get around unicode problems when interfacing with vim
+vim_encoding=vim.eval('&encoding')
+
 try:
     sys.stdout.flush
 except AttributeError:
@@ -91,8 +94,7 @@ def get_doc(word):
     msg_id = km.shell_channel.object_info(word)
     doc = get_doc_msg(msg_id)
     # get around unicode problems when interfacing with vim
-    encoding=vim.eval('&encoding')
-    return [d.encode(encoding) for d in doc]
+    return [d.encode(vim_encoding) for d in doc]
 
 import re
 # from http://serverfault.com/questions/71285/in-centos-4-4-how-can-i-strip-escape-sequences-from-a-text-file
@@ -198,14 +200,13 @@ def update_subchannel_msgs(debug=False):
         if s.find('\n')==-1:
             # somewhat ugly unicode workaround from http://vim.1045645.n5.nabble.com/Limitations-of-vim-python-interface-with-respect-to-character-encodings-td1223881.html
             if isinstance(s,unicode):
-                s=s.encode(vim.eval("&encoding"))
+                s=s.encode(vim_encoding)
             b.append(s)
         else:
             try:
                 b.append(s.splitlines())
             except:
-                encoding = vim.eval("&encoding")
-                b.append([l.encode(encoding) for l in s.splitlines()])
+                b.append([l.encode(vim_encoding) for l in s.splitlines()])
     vim.command('normal G') # go to the end of the file
     vim.command('silent e #|silent pedit vim-ipython')
     
@@ -398,26 +399,33 @@ findstart = vim.eval("a:findstart")
 msg_id = km.shell_channel.complete(base, vim.current.line, vim.eval("col('.')"))
 try:
     m = get_child_msg(msg_id)
-    # get rid of unicode (sporadic issue, haven't tracked down when it happens)
-    #matches = [str(u) for u in m['content']['matches']]
-    # mirk sez do: completion_str = '[' + ', '.join(msg['content']['matches'] ) + ']'
-    # because str() won't work for non-ascii characters
     matches = m['content']['matches']
-    #end = len(base)
-    #completions = [m[end:]+findstart+base for m in matches]
     matches.insert(0,base) # the "no completion" version
-    #echo(str(matches))
-    completions = matches
+    # we need to be careful with unicode, because we can have unicode
+    # completions for filenames (for the %run magic, for example). So the next
+    # line will fail on those:
+    #completions= [str(u) for u in matches]
+    # because str() won't work for non-ascii characters
+    # and we also have problems with unicode in vim, hence the following:
+    completions = [s.encode(vim_encoding) for s in matches]
 except Empty:
     echo("no reply from IPython kernel")
     completions=['']
-vim.command("let l:completions = %s"% completions)
+## Additionally, we have no good way of communicating lists to vim, so we have
+## to turn in into one long string, which can be problematic if e.g. the
+## completions contain quotes. The next line will not work if some filenames
+## contain quotes - but if that's the case, the user's just asking for
+## it, right?
+#completions = '["'+ '", "'.join(completions)+'"]'
+#vim.command("let completions = %s" % completions)
+## An alternative for the above, which will insert matches one at a time, so
+## if there's a problem with turning a match into a string, it'll just not
+## include the problematic match, instead of not including anything. There's a
+## bit more indirection here, but I think it's worth it
+for c in completions:
+    vim.command('call add(res,"'+c+'")')
 endpython
-	    for m in l:completions
-	      "if m =~ '^' . a:base
-            call add(res, m)
-	      "endif
-	    endfor
+        "call extend(res,completions) 
 	    return res
 	  endif
 	endfun
