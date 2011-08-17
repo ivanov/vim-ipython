@@ -144,7 +144,15 @@ Current issues:
   
       $ vim -c ':py import os; print os.__file__' -c ':q'
       $ python -c ':py import os; print os.__file__'
-  
+
+- For vim inside a terminal, using the arrow keys won't work inside a
+  documentation buffer, because the mapping for ``<Esc>`` overlaps with
+  ``^[OA`` and so on, and we use ``<Esc>`` as a quick way of closing the
+  documentation preview window. If you want go without this quick close
+  functionality and want to use the arrow keys instead, look for instructions
+  starting with "Known issue: to enable the use of arrow keys..." in the
+  ``get_doc_buffer`` function.
+
 ------
 Thanks
 ------

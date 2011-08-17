@@ -136,12 +136,18 @@ def get_doc_buffer(level=0):
     if len(doc) ==0:
         echo(word+" not found","Error")
         return
+    # close any currently open preview windows
     vim.command('pcl')
+    # documentation buffer name is same as the query made to ipython
     vim.command('new '+word)
     vim.command('setlocal pvw modifiable noro')
     # doc window quick quit keys: 'q' and 'escape'
     vim.command('map <buffer> q :q<CR>')
-    vim.command('map <buffer>  :q<CR>')
+    # Known issue: to enable the use of arrow keys inside the terminal when
+    # viewing the documentation, comment out the next line
+    vim.command('map <buffer> <Esc> :q<CR>')
+    # and uncomment this line (which will work if you have a timoutlen set)
+    #vim.command('map <buffer> <Esc><Esc> :q<CR>')
     b = vim.current.buffer
     b[:] = None
     b[:] = doc
