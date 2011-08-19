@@ -189,6 +189,11 @@ def update_subchannel_msgs(debug=False):
     b = vim.current.buffer
     for m in msgs:
         db.append(str(m).splitlines())
+        if 'msg_type' not in m:
+            # debug information
+            #echo('skipping a message on sub_channel','WarningMsg')
+            #echo(str(m))
+            continue
         if m['msg_type'] == 'status':
             continue
         if m['msg_type'] == 'stream':
