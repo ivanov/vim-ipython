@@ -139,7 +139,7 @@ Current issues:
   
   **or**
 
-  2. your vim is compiled against a different python than you are launching (see
+  2. your vim is compiled against a different python than you are launching. See
      if there's a difference between ::
   
       $ vim -c ':py import os; print os.__file__' -c ':q'
@@ -157,4 +157,9 @@ Current issues:
 Thanks
 ------
 * @MinRK for guiding me through the IPython kernel manager protocol.
-* @nakamuray and @tcheneau for reporting and providing a fix for when vim is compiled without a gui
+
+*Bugs*
+* @nakamuray and @tcheneau for reporting and providing a fix for when vim is compiled without a gui (#1)
+* @unpingco for reporting Windows bugs (#3,#4)
+* @simon-b for terminal vim arrow key issue (#5)
+* @jorgesca and @kwgoodman for shell (#6)
