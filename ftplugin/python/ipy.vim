@@ -170,9 +170,11 @@ def update_subchannel_msgs(debug=False):
         db = vim.current.buffer
     else:
         db = []
-    vim.command("pcl")
-    vim.command("silent pedit vim-ipython")
-    vim.command("normal P") #switch to preview window
+    startedin_vimipython = vim.current.buffer.name.endswith('vim-ipython')
+    if not startedin_vimipython:
+        vim.command("pcl")
+        vim.command("silent pedit vim-ipython")
+        vim.command("normal P") #switch to preview window
     # subchannel window quick quit key 'q'
     vim.command('map <buffer> q :q<CR>')
     vim.command("set bufhidden=hide buftype=nofile ft=python")
@@ -219,7 +221,8 @@ def update_subchannel_msgs(debug=False):
             except:
                 b.append([l.encode(vim_encoding) for l in s.splitlines()])
     vim.command('normal G') # go to the end of the file
-    vim.command('silent e #|silent pedit vim-ipython')
+    if not startedin_vimipython:
+        vim.command('normal p') # go back to where you were
     
 def get_child_msg(msg_id):
     # XXX: message handling should be split into its own process in the future
@@ -254,7 +257,6 @@ def with_subchannel(f):
             f()
             if monitor_subchannel:
                 update_subchannel_msgs()
-                vim.command('normal p') # go back to where you were
         except AttributeError: #if km is None
             echo("not connected to IPython", 'Error')
     return f_with_update
