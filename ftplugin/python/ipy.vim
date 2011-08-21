@@ -204,7 +204,11 @@ def update_subchannel_msgs(debug=False):
             s = "Out[%d]: " % m['content']['execution_count']
             s += m['content']['data']['text/plain']
         if m['msg_type'] == 'pyin':
-            s = "\nIn []: "
+            # TODO: the next line allows us to resend a line to ipython if
+            # %doctest_mode is on. In the future, IPython will send the
+            # execution_count on subchannel, so this will need to be updated
+            # once that happens
+            s = "\nIn [00]: "
             s += m['content']['code'].strip()
         if m['msg_type'] == 'pyerr':
             c = m['content']
