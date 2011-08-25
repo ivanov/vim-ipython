@@ -190,32 +190,34 @@ def update_subchannel_msgs(debug=False):
     vim.command("syn match Red /^Out\[[0-9]*\]\:/")
     b = vim.current.buffer
     for m in msgs:
-        db.append(str(m).splitlines())
+        #db.append(str(m).splitlines())
+        s = ''
         if 'msg_type' not in m:
             # debug information
             #echo('skipping a message on sub_channel','WarningMsg')
             #echo(str(m))
             continue
-        if m['msg_type'] == 'status':
+        elif m['msg_type'] == 'status':
             continue
-        if m['msg_type'] == 'stream':
+        elif m['msg_type'] == 'stream':
             s = strip_color_escapes(m['content']['data'])
-        if m['msg_type'] == 'pyout':
+        elif m['msg_type'] == 'pyout':
             s = "Out[%d]: " % m['content']['execution_count']
             s += m['content']['data']['text/plain']
-        if m['msg_type'] == 'pyin':
+        elif m['msg_type'] == 'pyin':
             # TODO: the next line allows us to resend a line to ipython if
             # %doctest_mode is on. In the future, IPython will send the
             # execution_count on subchannel, so this will need to be updated
             # once that happens
             s = "\nIn [00]: "
             s += m['content']['code'].strip()
-        if m['msg_type'] == 'pyerr':
+        elif m['msg_type'] == 'pyerr':
             c = m['content']
             s = "\n".join(map(strip_color_escapes,c['traceback']))
             s += c['ename'] + ":" + c['evalue']
-        if s.find('\n')==-1:
-            # somewhat ugly unicode workaround from http://vim.1045645.n5.nabble.com/Limitations-of-vim-python-interface-with-respect-to-character-encodings-td1223881.html
+        if s.find('\n') == -1:
+            # somewhat ugly unicode workaround from 
+            # http://vim.1045645.n5.nabble.com/Limitations-of-vim-python-interface-with-respect-to-character-encodings-td1223881.html
             if isinstance(s,unicode):
                 s=s.encode(vim_encoding)
             b.append(s)
