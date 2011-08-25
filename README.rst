@@ -153,12 +153,18 @@ Current issues:
   starting with "Known issue: to enable the use of arrow keys..." in the
   ``get_doc_buffer`` function.
 
+- @fholgado's update to ``minibufexpl.vim`` that is up on GitHub will always
+  put the cursor in the minibuf after sending a command when
+  ``monitor_subchannel`` is set. This is a bug in minibufexpl.vim and the workaround
+  is described in vim-ipython issue #7.
+
 ------
 Thanks
 ------
 * @MinRK for guiding me through the IPython kernel manager protocol.
 
 *Bugs*
+
 * @nakamuray and @tcheneau for reporting and providing a fix for when vim is compiled without a gui (#1)
 * @unpingco for reporting Windows bugs (#3,#4)
 * @simon-b for terminal vim arrow key issue (#5)
