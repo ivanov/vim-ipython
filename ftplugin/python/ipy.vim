@@ -192,26 +192,26 @@ def update_subchannel_msgs(debug=False):
     for m in msgs:
         #db.append(str(m).splitlines())
         s = ''
-        if 'msg_type' not in m:
+        if 'msg_type' not in m['header']:
             # debug information
             #echo('skipping a message on sub_channel','WarningMsg')
             #echo(str(m))
             continue
-        elif m['msg_type'] == 'status':
+        elif m['header']['msg_type'] == 'status':
             continue
-        elif m['msg_type'] == 'stream':
+        elif m['header']['msg_type'] == 'stream':
             s = strip_color_escapes(m['content']['data'])
-        elif m['msg_type'] == 'pyout':
+        elif m['header']['msg_type'] == 'pyout':
             s = "Out[%d]: " % m['content']['execution_count']
             s += m['content']['data']['text/plain']
-        elif m['msg_type'] == 'pyin':
+        elif m['header']['msg_type'] == 'pyin':
             # TODO: the next line allows us to resend a line to ipython if
             # %doctest_mode is on. In the future, IPython will send the
             # execution_count on subchannel, so this will need to be updated
             # once that happens
             s = "\nIn [00]: "
             s += m['content']['code'].strip()
-        elif m['msg_type'] == 'pyerr':
+        elif m['header']['msg_type'] == 'pyerr':
             c = m['content']
             s = "\n".join(map(strip_color_escapes,c['traceback']))
             s += c['ename'] + ":" + c['evalue']
