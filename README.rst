@@ -26,7 +26,7 @@ in vim, you should be good to go.
 -----------------
 Quickstart Guide:
 -----------------
-Start ``ipython qtconsole`` and copy the connection string.
+Start ``ipython qtconsole`` [*]_ and copy the connection string.
 Source ``ipy.vim`` file, which provides new IPython command::
 
   :source ipy.vim  
@@ -41,6 +41,14 @@ The :IPython command allows you to put the full string, e.g.::
 
 The ``:IPythonClipboard`` command just uses the ``+`` register to get the
 connection string, whereas ``:IPythonXSelection`` uses the ``*`` register
+
+.. [*] Though the demos above use ``qtconsole``, it is not required
+    for this workflow, it's just that it was the easiest way to show how to
+    make use of the new functionality in 0.11 release. In the current git
+    trunk of IPython, you can use ``ipython kernel`` to create a kernel and
+    get the connection string to use for any frontend (including vim-ipython).
+    If you are still using 0.11, you can launch a regular kernel using
+    ``python -c "from IPython.zmq.ipkernel import main; main()"``
 
 ------------------------
 Sending lines to IPython
