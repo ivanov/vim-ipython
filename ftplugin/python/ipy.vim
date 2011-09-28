@@ -353,34 +353,40 @@ fun! <SID>toggle_send_on_save()
     endif
 endfun
 
-map <silent> <F5> :python run_this_file()<CR>
-map <silent> <S-F5> :python run_this_line()<CR>
-map <silent> <F9> :python run_these_lines()<CR>
-map <silent> <leader>d :py get_doc_buffer()<CR>
-map <silent> <leader>s :py update_subchannel_msgs(); echo("vim-ipython shell updated",'Operator')<CR>
-map <silent> <S-F9> :python toggle_reselect()<CR>
-"map <silent> <C-F6> :python send('%pdb')<CR>
-"map <silent> <F6> :python set_breakpoint()<CR>
-"map <silent> <s-F6> :python clear_breakpoint()<CR>
-"map <silent> <F7> :python run_this_file_pdb()<CR>
-"map <silent> <s-F7> :python clear_all_breaks()<CR>
-imap <C-F5> <C-O><F5>
-imap <S-F5> <C-O><S-F5>
-imap <silent> <F5> <C-O><F5>
-map <C-F5> :call <SID>toggle_send_on_save()<CR>
+" Allow custom mappings
+if !exists('g:ipy_perform_mappings')
+    let g:ipy_perform_mappings = 1
+endif
+if g:ipy_perform_mappings != 0
+    map <silent> <F5> :python run_this_file()<CR>
+    map <silent> <S-F5> :python run_this_line()<CR>
+    map <silent> <F9> :python run_these_lines()<CR>
+    map <silent> <leader>d :py get_doc_buffer()<CR>
+    map <silent> <leader>s :py update_subchannel_msgs(); echo("vim-ipython shell updated",'Operator')<CR>
+    map <silent> <S-F9> :python toggle_reselect()<CR>
+    "map <silent> <C-F6> :python send('%pdb')<CR>
+    "map <silent> <F6> :python set_breakpoint()<CR>
+    "map <silent> <s-F6> :python clear_breakpoint()<CR>
+    "map <silent> <F7> :python run_this_file_pdb()<CR>
+    "map <silent> <s-F7> :python clear_all_breaks()<CR>
+    imap <C-F5> <C-O><F5>
+    imap <S-F5> <C-O><S-F5>
+    imap <silent> <F5> <C-O><F5>
+    map <C-F5> :call <SID>toggle_send_on_save()<CR>
 
-"pi custom
-map <silent> <C-Return> :python run_this_file()<CR>
-map <silent> <C-s> :python run_this_line()<CR>
-imap <silent> <C-s> <C-O>:python run_this_line()<CR>
-map <silent> <M-s> :python dedent_run_this_line()<CR>
-vmap <silent> <C-S> :python run_these_lines()<CR>
-vmap <silent> <M-s> :python dedent_run_these_lines()<CR>
-map <silent> <C-p> :python set_this_line()<CR>
-map <silent> <M-c> I#<ESC>
-vmap <silent> <M-c> I#<ESC>
-map <silent> <M-C> :s/^\([ \t]*\)#/\1/<CR>
-vmap <silent> <M-C> :s/^\([ \t]*\)#/\1/<CR>
+    "pi custom
+    map <silent> <C-Return> :python run_this_file()<CR>
+    map <silent> <C-s> :python run_this_line()<CR>
+    imap <silent> <C-s> <C-O>:python run_this_line()<CR>
+    map <silent> <M-s> :python dedent_run_this_line()<CR>
+    vmap <silent> <C-S> :python run_these_lines()<CR>
+    vmap <silent> <M-s> :python dedent_run_these_lines()<CR>
+    map <silent> <C-p> :python set_this_line()<CR>
+    map <silent> <M-c> I#<ESC>
+    vmap <silent> <M-c> I#<ESC>
+    map <silent> <M-C> :s/^\([ \t]*\)#/\1/<CR>
+    vmap <silent> <M-C> :s/^\([ \t]*\)#/\1/<CR>
+endif
 
 command! -nargs=+ IPython :py km_from_string("<args>")
 command! -nargs=0 IPythonClipboard :py km_from_string(vim.eval('@+'))
