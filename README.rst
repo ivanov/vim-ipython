@@ -124,6 +124,10 @@ You can change these at the top of the ipy.vim::
   monitor_subchannel = True   # update vim-ipython 'shell' on every send?
   run_flags= "-i"             # flags to for IPython's run magic when using <F5>
 
+In your own ``.vimrc``, if you don't like the mappings provided by default,
+you can define a variable ``let g:ipy_perform_mappings=0`` which will prevent
+vim-ipython from defining any of the default mappings.
+
 ---------------
 Current issues:
 ---------------
@@ -177,3 +181,4 @@ Thanks
 * @unpingco for reporting Windows bugs (#3,#4)
 * @simon-b for terminal vim arrow key issue (#5)
 * @jorgesca and @kwgoodman for shell (#6)
+* @zeekay for easily allowing custom mappings (#9)
