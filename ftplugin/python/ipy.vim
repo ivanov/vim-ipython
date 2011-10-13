@@ -51,26 +51,43 @@ except NameError:
 
 def km_from_string(s):
     """create kernel manager from IPKernelApp string
-    such as '--shell=47378 --iopub=39859 --stdin=36778 --hb=52668'
+    such as '--shell=47378 --iopub=39859 --stdin=36778 --hb=52668' for 0.11
+    or just 'kernel-12345.json' for 0.12
     """
+    from os.path import join as pjoin
     from IPython.zmq.blockingkernelmanager import BlockingKernelManager, Empty
     from IPython.config.loader import KeyValueConfigLoader
     from IPython.zmq.kernelapp import kernel_aliases
     global km,send,Empty
-    # vim interface currently only deals with existing kernels
-    s = s.replace('--existing','')
-    loader = KeyValueConfigLoader(s.split(), aliases=kernel_aliases)
-    cfg = loader.load_config()['KernelApp']
-    try:
-        km = BlockingKernelManager(
-            shell_address=(ip, cfg['shell_port']),
-            sub_address=(ip, cfg['iopub_port']),
-            stdin_address=(ip, cfg['stdin_port']),
-            hb_address=(ip, cfg['hb_port']))
-    except KeyError,e:
-        echo(":IPython " +s + " failed", "Info")
-        echo("^-- failed --"+e.message.replace('_port','')+" not specified", "Error")
-        return
+
+    if 'connection_file' in BlockingKernelManager.class_trait_names():
+        from IPython.lib.kernel import find_connection_file
+        # 0.12 uses files instead of a collection of ports
+        # include default IPython search path
+        # filefind also allows for absolute paths, in which case the search
+        # is ignored
+        try:
+            fullpath = find_connection_file(s)
+        except IOError,e:
+            echo(":IPython " + s + " failed", "Info")
+            echo("^-- failed --" + s + " not found", "Error")
+            return
+        km = BlockingKernelManager(connection_file = fullpath)
+        km.load_connection_file()
+    else:
+        s = s.replace('--existing', '')
+        loader = KeyValueConfigLoader(s.split(), aliases=kernel_aliases)
+        cfg = loader.load_config()['KernelApp']
+        try:
+            km = BlockingKernelManager(
+                shell_address=(ip, cfg['shell_port']),
+                sub_address=(ip, cfg['iopub_port']),
+                stdin_address=(ip, cfg['stdin_port']),
+                hb_address=(ip, cfg['hb_port']))
+        except KeyError,e:
+            echo(":IPython " +s + " failed", "Info")
+            echo("^-- failed --"+e.message.replace('_port','')+" not specified", "Error")
+            return
     km.start_channels()
     send = km.shell_channel.execute
     return km
@@ -170,7 +187,8 @@ def update_subchannel_msgs(debug=False):
         db = vim.current.buffer
     else:
         db = []
-    startedin_vimipython = vim.current.buffer.name.endswith('vim-ipython')
+    b = vim.current.buffer
+    startedin_vimipython = (b.name is not None and b.name.endswith('vim-ipython'))
     if not startedin_vimipython:
         vim.command("pcl")
         vim.command("silent pedit vim-ipython")
