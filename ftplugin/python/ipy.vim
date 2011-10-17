@@ -51,8 +51,8 @@ except NameError:
 
 def km_from_string(s):
     """create kernel manager from IPKernelApp string
-    such as '--shell=47378 --iopub=39859 --stdin=36778 --hb=52668' for 0.11
-    or just 'kernel-12345.json' for 0.12
+    such as '--shell=47378 --iopub=39859 --stdin=36778 --hb=52668' for IPython 0.11
+    or just 'kernel-12345.json' for IPython 0.12
     """
     from os.path import join as pjoin
     from IPython.zmq.blockingkernelmanager import BlockingKernelManager, Empty
@@ -60,6 +60,7 @@ def km_from_string(s):
     from IPython.zmq.kernelapp import kernel_aliases
     global km,send,Empty
 
+    s = s.replace('--existing', '')
     if 'connection_file' in BlockingKernelManager.class_trait_names():
         from IPython.lib.kernel import find_connection_file
         # 0.12 uses files instead of a collection of ports
@@ -67,7 +68,7 @@ def km_from_string(s):
         # filefind also allows for absolute paths, in which case the search
         # is ignored
         try:
-            fullpath = find_connection_file(s)
+            fullpath = find_connection_file(s.lstrip().rstrip())
         except IOError,e:
             echo(":IPython " + s + " failed", "Info")
             echo("^-- failed --" + s + " not found", "Error")
@@ -75,7 +76,6 @@ def km_from_string(s):
         km = BlockingKernelManager(connection_file = fullpath)
         km.load_connection_file()
     else:
-        s = s.replace('--existing', '')
         loader = KeyValueConfigLoader(s.split(), aliases=kernel_aliases)
         cfg = loader.load_config()['KernelApp']
         try:
