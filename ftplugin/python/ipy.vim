@@ -26,7 +26,7 @@ import vim
 import sys
 
 # get around unicode problems when interfacing with vim
-vim_encoding=vim.eval('&encoding')
+vim_encoding=vim.eval('&encoding') or 'utf-8'
 
 try:
     sys.stdout.flush
