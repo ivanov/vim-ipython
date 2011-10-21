@@ -68,10 +68,20 @@ def km_from_string(s):
         # filefind also allows for absolute paths, in which case the search
         # is ignored
         try:
-            fullpath = find_connection_file(s.lstrip().rstrip())
+            # XXX: the following approach will be brittle, depending on what
+            # connection strings will end up looking like in the future, and
+            # whether or not they are allowed to have spaces. I'll have to sync
+            # up with the IPython team to address these issues -pi
+            if '--profile' in s:
+                k,p = s.split('--profile')
+                k = k.lstrip().rstrip() # kernel part of the string
+                p = p.lstrip().rstrip() # profile part of the string
+                fullpath = find_connection_file(k,p)
+            else:
+                fullpath = find_connection_file(s.lstrip().rstrip())
         except IOError,e:
             echo(":IPython " + s + " failed", "Info")
-            echo("^-- failed --" + s + " not found", "Error")
+            echo("^-- failed '" + s + "' not found", "Error")
             return
         km = BlockingKernelManager(connection_file = fullpath)
         km.load_connection_file()
