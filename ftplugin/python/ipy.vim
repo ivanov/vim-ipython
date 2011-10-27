@@ -237,7 +237,10 @@ def update_subchannel_msgs(debug=False):
             # %doctest_mode is on. In the future, IPython will send the
             # execution_count on subchannel, so this will need to be updated
             # once that happens
-            s = "\nIn [00]: "
+            if 'execution_count' in m['content']:
+                s = "\nIn [%d]: "% m['content']['execution_count']
+            else:
+                s = "\nIn [00]: "
             s += m['content']['code'].strip()
         elif m['header']['msg_type'] == 'pyerr':
             c = m['content']
