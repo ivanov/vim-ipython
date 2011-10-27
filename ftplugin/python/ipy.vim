@@ -205,6 +205,7 @@ def update_subchannel_msgs(debug=False):
         vim.command("normal P") #switch to preview window
     # subchannel window quick quit key 'q'
     vim.command('map <buffer> q :q<CR>')
+    vim.command('map <buffer>  :py km.interrupt_kernel()<cr>:echo("KeyboardInterrupt (sent to ipython)","Operator")<CR>')
     vim.command("set bufhidden=hide buftype=nofile ft=python")
     
     #syntax highlighting for python prompt
