@@ -200,8 +200,22 @@ def update_subchannel_msgs(debug=False):
     b = vim.current.buffer
     startedin_vimipython = (b.name is not None and b.name.endswith('vim-ipython'))
     if not startedin_vimipython:
-        vim.command("pcl")
-        vim.command("silent pedit vim-ipython")
+        # switch to preview window
+        vim.command(
+            "try"
+            "|silent! wincmd P"
+            "|catch /^Vim\%((\a\+)\)\=:E441/"
+            "|silent pedit vim-ipython"
+            "|silent! wincmd P"
+            "|endtry")
+        # if the current window is called 'vim-ipython'
+        if vim.eval('@%')=='vim-ipython':
+            # set the preview window height to the current height
+            vim.command("set pvh=" + vim.eval('winheight(0)'))
+        else:
+            # close preview window, it was something other than 'vim-ipython'
+            vim.command("pcl")
+            vim.command("silent pedit vim-ipython")
         vim.command("normal P") #switch to preview window
     # subchannel window quick quit key 'q'
     vim.command('map <buffer> q :q<CR>')
