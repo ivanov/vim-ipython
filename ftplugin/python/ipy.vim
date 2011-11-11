@@ -205,7 +205,7 @@ def update_subchannel_msgs(debug=False):
             "try"
             "|silent! wincmd P"
             "|catch /^Vim\%((\a\+)\)\=:E441/"
-            "|silent pedit vim-ipython"
+            "|silent pedit +set\ ma vim-ipython"
             "|silent! wincmd P"
             "|endtry")
         # if the current window is called 'vim-ipython'
@@ -215,8 +215,8 @@ def update_subchannel_msgs(debug=False):
         else:
             # close preview window, it was something other than 'vim-ipython'
             vim.command("pcl")
-            vim.command("silent pedit vim-ipython")
-        vim.command("normal P") #switch to preview window
+            vim.command("silent pedit +set\ ma vim-ipython")
+            vim.command("wincmd P") #switch to preview window
     # subchannel window quick quit key 'q'
     vim.command('map <buffer> q :q<CR>')
     vim.command("set bufhidden=hide buftype=nofile ft=python")
