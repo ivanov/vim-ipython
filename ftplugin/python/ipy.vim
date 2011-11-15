@@ -347,12 +347,12 @@ def run_these_lines():
 def dedent_run_this_line():
     vim.command("left")
     run_this_line()
-    vim.command("undo")
+    vim.command("silent undo")
 
 def dedent_run_these_lines():
     vim.command("'<,'>left")
     run_these_lines()
-    vim.command("undo")
+    vim.command("silent undo")
     
 #def set_this_line():
 #    # not sure if there's a way to do this, since we have multiple clients
