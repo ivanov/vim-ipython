@@ -350,7 +350,10 @@ def dedent_run_this_line():
     vim.command("silent undo")
 
 def dedent_run_these_lines():
-    vim.command("'<,'>left")
+    r = vim.current.range
+    shiftwidth = vim.eval('&shiftwidth')
+    count = int(vim.eval('indent(%d+1)/%s' % (r.start,shiftwidth)))
+    vim.command("'<,'>" + "<"*count)
     run_these_lines()
     vim.command("silent undo")
     
