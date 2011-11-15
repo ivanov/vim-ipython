@@ -49,7 +49,7 @@ try:
 except NameError:
     km = None
 
-def km_from_string(s):
+def km_from_string(s=''):
     """create kernel manager from IPKernelApp string
     such as '--shell=47378 --iopub=39859 --stdin=36778 --hb=52668' for IPython 0.11
     or just 'kernel-12345.json' for IPython 0.12
@@ -86,6 +86,9 @@ def km_from_string(s):
         km = BlockingKernelManager(connection_file = fullpath)
         km.load_connection_file()
     else:
+        if s == '':
+            echo(":IPython 0.11 requires the full connection string")
+            return
         loader = KeyValueConfigLoader(s.split(), aliases=kernel_aliases)
         cfg = loader.load_config()['KernelApp']
         try:
@@ -433,7 +436,7 @@ if g:ipy_perform_mappings != 0
     vmap <silent> <M-C> :s/^\([ \t]*\)#/\1/<CR>
 endif
 
-command! -nargs=+ IPython :py km_from_string("<args>")
+command! -nargs=* IPython :py km_from_string("<args>")
 command! -nargs=0 IPythonClipboard :py km_from_string(vim.eval('@+'))
 command! -nargs=0 IPythonXSelection :py km_from_string(vim.eval('@*'))
 
