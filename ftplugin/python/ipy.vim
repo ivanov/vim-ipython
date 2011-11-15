@@ -198,7 +198,7 @@ def update_subchannel_msgs(debug=False):
     else:
         db = []
     b = vim.current.buffer
-    startedin_vimipython = (b.name is not None and b.name.endswith('vim-ipython'))
+    startedin_vimipython = vim.eval('@%')=='vim-ipython'
     if not startedin_vimipython:
         # switch to preview window
         vim.command(
@@ -217,9 +217,9 @@ def update_subchannel_msgs(debug=False):
             vim.command("pcl")
             vim.command("silent pedit +set\ ma vim-ipython")
             vim.command("wincmd P") #switch to preview window
-    # subchannel window quick quit key 'q'
-    vim.command('map <buffer> q :q<CR>')
-    vim.command("set bufhidden=hide buftype=nofile ft=python")
+            # subchannel window quick quit key 'q'
+            vim.command('map <buffer> q :q<CR>')
+            vim.command("set bufhidden=hide buftype=nofile ft=python")
     
     #syntax highlighting for python prompt
     # QtConsole In[] is blue, but I prefer the oldschool green
