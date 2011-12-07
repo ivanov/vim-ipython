@@ -307,11 +307,11 @@ def print_prompt(prompt,msg_id=None):
     else:
         echo("In[]: %s" % prompt)
 
-def with_subchannel(f):
+def with_subchannel(f,*args):
     "conditionally monitor subchannel"
-    def f_with_update():
+    def f_with_update(*args):
         try:
-            f()
+            f(*args)
             if monitor_subchannel:
                 update_subchannel_msgs()
         except AttributeError: #if km is None
@@ -327,6 +327,13 @@ def run_this_file():
 def run_this_line():
     msg_id = send(vim.current.line)
     print_prompt(vim.current.line, msg_id)
+
+@with_subchannel
+def run_command(cmd):
+    msg_id = send(cmd)
+    print_prompt(cmd, msg_id)
+    if monitor_subchannel:
+        update_subchannel_msgs()
 
 @with_subchannel
 def run_these_lines():
@@ -427,6 +434,10 @@ if g:ipy_perform_mappings != 0
     imap <S-F5> <C-O><S-F5>
     imap <silent> <F5> <C-O><F5>
     map <C-F5> :call <SID>toggle_send_on_save()<CR>
+    "" Example of how to quickly clear the current plot with a keystroke
+    "map <silent> <F12> :python run_command("plt.clf()")<cr>
+    "" Example of how to quickly close all figures with a keystroke
+    "map <silent> <F11> :python run_command("plt.close('all')")<cr>
 
     "pi custom
     map <silent> <C-Return> :python run_this_file()<CR>
