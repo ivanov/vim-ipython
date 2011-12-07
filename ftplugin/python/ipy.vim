@@ -274,6 +274,9 @@ def update_subchannel_msgs(debug=False):
                 b.append(s.splitlines())
             except:
                 b.append([l.encode(vim_encoding) for l in s.splitlines()])
+    # make a newline so we can just start typing there
+    if b[-1] != '':
+        b.append([''])
     vim.command('normal G') # go to the end of the file
     if not startedin_vimipython:
         vim.command('normal p') # go back to where you were
