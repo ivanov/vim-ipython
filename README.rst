@@ -161,7 +161,7 @@ Current issues:
      if there's a difference between ::
 
       $ vim -c ':py import os; print os.__file__' -c ':q'
-      $ python -c ':py import os; print os.__file__'
+      $ python -c 'import os; print os.__file__'
 
 - For vim inside a terminal, using the arrow keys won't work inside a
   documentation buffer, because the mapping for ``<Esc>`` overlaps with
