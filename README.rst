@@ -16,7 +16,7 @@ IPython.
 
 The big change from previous versions of ``ipy.vim`` is that it no longer
 requires the old brittle ``ipy_vimserver.py`` instantiation, and since
-it uses just vim and python, it is platform independent (i.e. should work
+it uses just vim and python, it is platform independent (i.e. works
 even on windows, unlike the previous \*nix only solution). The requirements
 are IPython 0.11+ with zeromq capabilities, vim compiled with +python.
 
@@ -45,15 +45,28 @@ and for IPython 0.12, like this::
   :IPython --existing kernel-85997.json
 
 The ``:IPythonClipboard`` command just uses the ``+`` register to get the
-connection string, whereas ``:IPythonXSelection`` uses the ``*`` register
+connection string, whereas ``:IPythonXSelection`` uses the ``*`` register.
+
+**NEW in IPython 0.12**!
+Since IPython 0.12, you can simply use::
+
+  :IPython
+
+without arguments to connect to the most recent IPython session (this is the
+same as passing just the ``--existing`` flag to ``ipython qtconsole`` and
+``ipython console``.
 
 .. [*] Though the demos above use ``qtconsole``, it is not required
     for this workflow, it's just that it was the easiest way to show how to
-    make use of the new functionality in 0.11 release. In the current git
-    trunk of IPython, you can use ``ipython kernel`` to create a kernel and
-    get the connection string to use for any frontend (including vim-ipython).
-    If you are still using 0.11, you can launch a regular kernel using
-    ``python -c "from IPython.zmq.ipkernel import main; main()"``
+    make use of the new functionality in 0.11 release. Since IPython 0.12, you
+    can use ``ipython kernel`` to create a kernel and get the connection
+    string to use for any frontend (including vim-ipython), or use ``ipython
+    console`` to create a kernel and immediately connect to it using a
+    terminal-based client. You can even connect to an active IPython Notebook
+    kernel - just watch for the connection string that gets printed when you
+    open the notebook, or use the ``%connect_info`` magic to get the
+    connection string.  If you are still using 0.11, you can launch a regular
+    kernel using ``python -c "from IPython.zmq.ipkernel import main; main()"``
 
 ------------------------
 Sending lines to IPython
@@ -87,12 +100,17 @@ Then, go to the qtconsole and run this line::
 
 You can also send whole files to IPython's ``%run`` magic using ``<F5>``.
 
+**NEW in IPython 0.12**!
+If you're trying to do run code fragments that have leading whitespace, use
+``<Alt-S>`` instead - it will dedent a single line, and remove the leading
+whitespace of the first line from all lines in a visual mode selection.
+
 -------------------------------
 IPython's object? Functionality
 -------------------------------
 
-If you're using gvim, mouse-over a variable to see IPython's ? equivalent. If
-you're using vim from a terminal, or want to copy something from the
+If you're using gvim, mouse-over a variable to see IPython's ``?`` equivalent.
+If you're using vim from a terminal, or want to copy something from the
 docstring, type ``<leader>d``. ``<leader>`` is usually ``\`` (the backslash
 key).  This will open a quickpreview window, which can be closed by hitting
 ``q`` or ``<escape>``.
@@ -180,10 +198,15 @@ Current issues:
 Thanks and Bug Participation
 ----------------------------
 * @MinRK for guiding me through the IPython kernel manager protocol.
-* @nakamuray and @tcheneau for reporting and providing a fix for when vim is compiled without a gui (#1)
-* @unpingco for reporting Windows bugs (#3,#4)
+* @nakamuray and @tcheneau for reporting and providing a fix for when vim is
+  compiled without a gui (#1)
+* @unpingco for reporting Windows bugs (#3,#4), providing better multiline
+  dedenting (#15), and suggesting that a resized vim-ipython shell stays
+  resized (#16).
 * @simon-b for terminal vim arrow key issue (#5)
-* @jorgesca and @kwgoodman for shell (#6)
+* @jorgesca and @kwgoodman for shell update problems (#6)
 * @zeekay for easily allowing custom mappings (#9)
 * @minrk for support of connection_file-based IPython connection (#13)
 * @jorgesca for reporting the lack of profile handling capability (#14)
+* @enzbang for removing mapping that's not currently functional (#17)
+* @ogrisel  for fixing documentation typo (#19)
