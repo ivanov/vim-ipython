@@ -16,6 +16,10 @@
 "   (or :IPythonXSelection if you're using X11 without having to copy)
 "
 " written by Paul Ivanov (http://pirsquared.org)
+if !has('python')
+    " exit if python is not available.
+    finish
+endif
 python << EOF
 reselect = False            # reselect lines after sending from Visual mode
 show_execution_count = True # wait to get numbers for In[43]: feedback?
