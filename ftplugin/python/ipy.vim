@@ -107,6 +107,9 @@ def km_from_string(s=''):
             return
     km.start_channels()
     send = km.shell_channel.execute
+
+    # now that we're connect to an ipython kernel, activate completion machinery
+    vim.command('set completefunc=CompleteIPython')
     return km
 
 def echo(arg,style="Question"):
@@ -522,4 +525,3 @@ endpython
 	    return res
 	  endif
 	endfun
-set completefunc=CompleteIPython
