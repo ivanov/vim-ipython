@@ -196,10 +196,8 @@ def get_doc_buffer(level=0):
     #vim.command('pcl')
     #vim.command('pedit doc')
     #vim.command('normal ') # go to previous window
-    # "rest" is the syntax of python documentation.  Stock vim doesn't have
-    # a syntax file for rest, but if the user has installed one then this will
-    # cause the docs to be colorized.
-    vim.command('setlocal syntax=rest')
+    # use the ReST formatting that ships with stock vim
+    vim.command('setlocal syntax=rst')
 
 def update_subchannel_msgs(debug=False):
     msgs = km.sub_channel.get_msgs()
