@@ -25,6 +25,7 @@ reselect = False            # reselect lines after sending from Visual mode
 show_execution_count = True # wait to get numbers for In[43]: feedback?
 monitor_subchannel = True   # update vim-ipython 'shell' on every send?
 run_flags= "-i"             # flags to for IPython's run magic when using <F5>
+current_line = ''
 
 import vim
 import sys
@@ -517,6 +518,9 @@ fun! CompleteIPython(findstart, base)
 	      let start -= 1
 	    endwhile
         echo start
+        python << endpython
+current_line = vim.current.line
+endpython
 	    return start
 	  else
 	    " find months matching with "a:base"
@@ -524,7 +528,7 @@ fun! CompleteIPython(findstart, base)
         python << endpython
 base = vim.eval("a:base")
 findstart = vim.eval("a:findstart")
-msg_id = km.shell_channel.complete(base, vim.current.line, vim.eval("col('.')"))
+msg_id = km.shell_channel.complete(base, current_line, vim.eval("col('.')"))
 try:
     m = get_child_msg(msg_id)
     matches = m['content']['matches']
