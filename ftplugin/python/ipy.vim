@@ -241,6 +241,7 @@ def update_subchannel_msgs(debug=False):
     vim.command("syn match Green /^In \[[0-9]*\]\:/")
     vim.command("syn match Red /^Out\[[0-9]*\]\:/")
     b = vim.current.buffer
+    update_occured = False
     for m in msgs:
         #db.append(str(m).splitlines())
         s = ''
@@ -281,12 +282,14 @@ def update_subchannel_msgs(debug=False):
                 b.append(s.splitlines())
             except:
                 b.append([l.encode(vim_encoding) for l in s.splitlines()])
+        update_occured = True
     # make a newline so we can just start typing there
     if b[-1] != '':
         b.append([''])
     vim.command('normal G') # go to the end of the file
     if not startedin_vimipython:
         vim.command('normal p') # go back to where you were
+    return update_occured
     
 def get_child_msg(msg_id):
     # XXX: message handling should be split into its own process in the future
@@ -420,6 +423,35 @@ fun! <SID>toggle_send_on_save()
         echo "Autosend Off"
     endif
 endfun
+
+" Update the vim-ipython shell when the cursor is not moving.
+" You can change how quickly this happens after you stop moving the cursor by
+" setting 'updatetime' (in milliseconds). For example, to have this event
+" trigger after 1 second:
+"
+"       :set updatetime 1000
+"
+" NOTE: This will only be triggered once, after the first 'updatetime'
+" milliseconds, *not* every 'updatetime' milliseconds. see :help CursorHold
+" for more info.
+"
+" TODO: Make this easily configurable on the fly, so that an introspection
+" buffer we may have opened up doesn't get closed just because of an idle
+" event (i.e. user pressed \d and then left the buffer that popped up, but
+" expects it to stay there).
+au CursorHold *.*,vim-ipython :python if update_subchannel_msgs(): echo("vim-ipython shell updated (on idle)",'Operator')
+
+" XXX: broken - cursor hold update for insert mode moves the cursor one
+" character to the left of the last character (update_subchannel_msgs must be
+" doing this)
+"au CursorHoldI *.* :python if update_subchannel_msgs(): echo("vim-ipython shell updated (on idle)",'Operator')
+
+" Same as above, but on regaining window focus (mostly for GUIs)
+au FocusGained *.*,vim-ipython :python if update_subchannel_msgs(): echo("vim-ipython shell updated (on input focus)",'Operator')
+
+" Update vim-ipython buffer when we move the cursor there. A message is only
+" displayed if vim-ipython buffer has been updated.
+au BufEnter vim-ipython :python if update_subchannel_msgs(): echo("vim-ipython shell updated (on buffer enter)",'Operator')
 
 " Allow custom mappings
 if !exists('g:ipy_perform_mappings')
