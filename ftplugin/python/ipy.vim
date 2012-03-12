@@ -1,6 +1,6 @@
 " Vim integration with IPython 0.11+
 "
-" A two-way integration between Vim and IPython. 
+" A two-way integration between Vim and IPython.
 "
 " Using this plugin, you can send lines or whole files for IPython to execute,
 " and also get back object introspection and word completions in Vim, like
@@ -11,11 +11,13 @@
 " -----------------
 " Start ipython qtconsole and copy the connection string.
 " Source this file, which provides new IPython command
-"   :source ipy.vim  
-"   :IPythonClipboard   
+"   :source ipy.vim
+"   :IPythonClipboard
 "   (or :IPythonXSelection if you're using X11 without having to copy)
 "
 " written by Paul Ivanov (http://pirsquared.org)
+"
+" TODO: bufenter / bufleave autoevents for vim-ipython
 if !has('python')
     " exit if python is not available.
     finish
@@ -139,7 +141,7 @@ import re
 strip = re.compile('\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]')
 def strip_color_escapes(s):
     return strip.sub('',s)
-    
+
 def get_doc_msg(msg_id):
     n = 13 # longest field name (empirically)
     b=[]
@@ -200,6 +202,8 @@ def get_doc_buffer(level=0):
     vim.command('setlocal syntax=rst')
 
 def update_subchannel_msgs(debug=False):
+    if km is None:
+        return False
     msgs = km.sub_channel.get_msgs()
     if debug:
         #try:
@@ -442,7 +446,7 @@ endfun
 " buffer we may have opened up doesn't get closed just because of an idle
 " event (i.e. user pressed \d and then left the buffer that popped up, but
 " expects it to stay there).
-au CursorHold *.*,vim-ipython :python if km and update_subchannel_msgs(): echo("vim-ipython shell updated (on idle)",'Operator')
+au CursorHold *.*,vim-ipython :python if update_subchannel_msgs(): echo("vim-ipython shell updated (on idle)",'Operator')
 
 " XXX: broken - cursor hold update for insert mode moves the cursor one
 " character to the left of the last character (update_subchannel_msgs must be
@@ -450,11 +454,11 @@ au CursorHold *.*,vim-ipython :python if km and update_subchannel_msgs(): echo("
 "au CursorHoldI *.* :python if update_subchannel_msgs(): echo("vim-ipython shell updated (on idle)",'Operator')
 
 " Same as above, but on regaining window focus (mostly for GUIs)
-au FocusGained *.*,vim-ipython :python if km and update_subchannel_msgs(): echo("vim-ipython shell updated (on input focus)",'Operator')
+au FocusGained *.*,vim-ipython :python if update_subchannel_msgs(): echo("vim-ipython shell updated (on input focus)",'Operator')
 
 " Update vim-ipython buffer when we move the cursor there. A message is only
 " displayed if vim-ipython buffer has been updated.
-au BufEnter vim-ipython :python if km and update_subchannel_msgs(): echo("vim-ipython shell updated (on buffer enter)",'Operator')
+au BufEnter vim-ipython :python if update_subchannel_msgs(): echo("vim-ipython shell updated (on buffer enter)",'Operator')
 
 " Allow custom mappings
 if !exists('g:ipy_perform_mappings')
@@ -465,7 +469,7 @@ if g:ipy_perform_mappings != 0
     map <silent> <S-F5> :python run_this_line()<CR>
     map <silent> <F9> :python run_these_lines()<CR>
     map <silent> <leader>d :py get_doc_buffer()<CR>
-    map <silent> <leader>s :py update_subchannel_msgs(); echo("vim-ipython shell updated",'Operator')<CR>
+    map <silent> <leader>s :py if update_subchannel_msgs(): echo("vim-ipython shell updated",'Operator')<CR>
     map <silent> <S-F9> :python toggle_reselect()<CR>
     "map <silent> <C-F6> :python send('%pdb')<CR>
     "map <silent> <F6> :python set_breakpoint()<CR>
