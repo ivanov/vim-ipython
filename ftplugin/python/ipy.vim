@@ -53,6 +53,10 @@ try:
     km
 except NameError:
     km = None
+try:
+    pid
+except NameError:
+    pid = None
 
 def km_from_string(s=''):
     """create kernel manager from IPKernelApp string
@@ -111,6 +115,7 @@ def km_from_string(s=''):
 
     # now that we're connect to an ipython kernel, activate completion machinery
     vim.command('set completefunc=CompleteIPython')
+    set_pid()
     return km
 
 def echo(arg,style="Question"):
@@ -367,6 +372,43 @@ def run_these_lines():
     prompt = "lines %d-%d "% (r.start+1,r.end+1)
     print_prompt(prompt,msg_id)
 
+
+def set_pid():
+    """
+    Explicitly ask the ipython kernel for its pid
+    """
+    global km, pid
+    lines = '\n'.join(['import os', 'os.getpid()'])
+    msg_id = send(lines)
+
+    # wait to get message back from kernel
+    try:
+        child = get_child_msg(msg_id)
+    except Empty:
+        echo("no reply from IPython kernel")
+
+    msgs = km.sub_channel.get_msgs()
+    msgs = (m for m in msgs if 'msg_type' in m['header'])
+    msgs = (m for m in msgs if m['header']['msg_type'] == 'pyout')
+    for m in msgs:
+	pid = int( m['content']['data']['text/plain'] )
+
+
+def interrupt_kernel_hack():
+    """
+    Sends the interrupt signal to the remote kernel.  This side steps the
+    (non-functional) ipython interrupt mechanisms.
+    Only works on posix.
+    """
+    global pid
+    import signal
+    import os
+    print 'interrupting', pid
+    if pid:
+	print 'interupting pid %i with signal %i' % (pid, signal.SIGINT)
+	os.kill(pid, signal.SIGINT)
+
+
 def dedent_run_this_line():
     vim.command("left")
     run_this_line()
@@ -497,6 +539,7 @@ endif
 command! -nargs=* IPython :py km_from_string("<args>")
 command! -nargs=0 IPythonClipboard :py km_from_string(vim.eval('@+'))
 command! -nargs=0 IPythonXSelection :py km_from_string(vim.eval('@*'))
+command! -nargs=0 IPythonInterrupt :py interrupt_kernel_hack()
 
 function! IPythonBalloonExpr()
 python << endpython
