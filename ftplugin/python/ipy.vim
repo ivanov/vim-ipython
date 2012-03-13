@@ -349,8 +349,6 @@ def run_this_line():
 def run_command(cmd):
     msg_id = send(cmd)
     print_prompt(cmd, msg_id)
-    if monitor_subchannel:
-        update_subchannel_msgs()
 
 @with_subchannel
 def run_these_lines():
