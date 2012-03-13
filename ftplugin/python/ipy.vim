@@ -237,7 +237,14 @@ def update_subchannel_msgs(debug=False):
             # subchannel window quick quit key 'q'
             vim.command('map <buffer> q :q<CR>')
             vim.command("set bufhidden=hide buftype=nofile ft=python")
-    
+            # make shift-enter and control-enter in insert mode behave same as in ipython notebook
+            # shift-enter send the current line, control-enter send the line
+            # but keeps it around for further editing.
+            vim.command("imap <buffer> <s-Enter> <esc>dd:python run_command('''<C-r>\"''')<CR>i")
+            # pkddA: paste, go up one line which is blank after run_command,
+            # delete it, and then back to insert mode
+            vim.command("imap <buffer> <c-Enter> <esc>dd:python run_command('''<C-r>\"''')<CR>pkddA")
+
     #syntax highlighting for python prompt
     # QtConsole In[] is blue, but I prefer the oldschool green
     # since it makes the vim-ipython 'shell' look like the holidays!
