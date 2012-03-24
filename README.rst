@@ -210,3 +210,9 @@ Thanks and Bug Participation
 * @jorgesca for reporting the lack of profile handling capability (#14)
 * @enzbang for removing mapping that's not currently functional (#17)
 * @ogrisel  for fixing documentation typo (#19)
+
+
+Similar Projects
+----------------
+https://github.com/jpalardy/vim-slime - Grab some text and "send" it to a GNU Screen / tmux session.
+http://code.google.com/p/conque/ - terminal emulator which uses a Vim buffer to display the program output. 
