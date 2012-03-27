@@ -238,6 +238,7 @@ def update_subchannel_msgs(debug=False):
             # subchannel window quick quit key 'q'
             vim.command('map <buffer> q :q<CR>')
             vim.command("set bufhidden=hide buftype=nofile ft=python")
+            vim.command("map <buffer>  :IPythonInterrupt<cr>")
     
     #syntax highlighting for python prompt
     # QtConsole In[] is blue, but I prefer the oldschool green
@@ -391,7 +392,7 @@ def set_pid():
     msgs = (m for m in msgs if 'msg_type' in m['header'])
     msgs = (m for m in msgs if m['header']['msg_type'] == 'pyout')
     for m in msgs:
-	pid = int( m['content']['data']['text/plain'] )
+        pid = int( m['content']['data']['text/plain'] )
 
 
 def interrupt_kernel_hack():
@@ -403,10 +404,10 @@ def interrupt_kernel_hack():
     global pid
     import signal
     import os
-    print 'interrupting', pid
     if pid:
-	print 'interupting pid %i with signal %i' % (pid, signal.SIGINT)
-	os.kill(pid, signal.SIGINT)
+        echo("KeyboardInterrupt (sent to ipython: pid " + 
+            "%i with signal %i)" % (pid, signal.SIGINT),"Operator")
+    os.kill(pid, signal.SIGINT)
 
 
 def dedent_run_this_line():
@@ -555,21 +556,21 @@ if has('balloon_eval')
 endif
 
 fun! CompleteIPython(findstart, base)
-	  if a:findstart
-	    " locate the start of the word
-	    let line = getline('.')
-	    let start = col('.') - 1
-	    while start > 0 && line[start-1] =~ '\k\|\.' "keyword
-	      let start -= 1
-	    endwhile
+      if a:findstart
+        " locate the start of the word
+        let line = getline('.')
+        let start = col('.') - 1
+        while start > 0 && line[start-1] =~ '\k\|\.' "keyword
+          let start -= 1
+        endwhile
         echo start
         python << endpython
 current_line = vim.current.line
 endpython
-	    return start
-	  else
-	    " find months matching with "a:base"
-	    let res = []
+        return start
+      else
+        " find months matching with "a:base"
+        let res = []
         python << endpython
 base = vim.eval("a:base")
 findstart = vim.eval("a:findstart")
@@ -603,6 +604,6 @@ for c in completions:
     vim.command('call add(res,"'+c+'")')
 endpython
         "call extend(res,completions) 
-	    return res
-	  endif
-	endfun
+        return res
+      endif
+    endfun
