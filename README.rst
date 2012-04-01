@@ -215,4 +215,5 @@ Thanks and Bug Participation
 Similar Projects
 ----------------
 https://github.com/jpalardy/vim-slime - Grab some text and "send" it to a GNU Screen / tmux session.
-http://code.google.com/p/conque/ - terminal emulator which uses a Vim buffer to display the program output. 
+http://www.vim.org/scripts/script.php?script_id=2711 - same as above, but looks more integrated
+http://code.google.com/p/conque/ - terminal emulator which uses a Vim buffer to display the program output.
