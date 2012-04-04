@@ -217,6 +217,11 @@ def vim_ipython_is_open():
     return False
 
 def update_subchannel_msgs(debug=False, force=False):
+    """
+    Grab any pending messages and place them inside the vim-ipython shell.
+    This function will do nothing if the vim-ipython shell is not visible,
+    unless force=True argument is passed.
+    """
     if km is None or (not vim_ipython_is_open() and not force):
         return False
     msgs = km.sub_channel.get_msgs()
