@@ -206,8 +206,18 @@ def get_doc_buffer(level=0):
     # use the ReST formatting that ships with stock vim
     vim.command('setlocal syntax=rst')
 
-def update_subchannel_msgs(debug=False):
-    if km is None:
+def vim_ipython_is_open():
+    """
+    Helper function to let us know if the vim-ipython shell is currently
+    visible
+    """
+    for w in vim.windows:
+        if w.buffer.name.endswith("vim-ipython"):
+            return True
+    return False
+
+def update_subchannel_msgs(debug=False, force=False):
+    if km is None or (not vim_ipython_is_open() and not force):
         return False
     msgs = km.sub_channel.get_msgs()
     if debug:
@@ -518,7 +528,7 @@ if g:ipy_perform_mappings != 0
     map <silent> <S-F5> :python run_this_line()<CR>
     map <silent> <F9> :python run_these_lines()<CR>
     map <silent> <leader>d :py get_doc_buffer()<CR>
-    map <silent> <leader>s :py if update_subchannel_msgs(): echo("vim-ipython shell updated",'Operator')<CR>
+    map <silent> <leader>s :py if update_subchannel_msgs(force=True): echo("vim-ipython shell updated",'Operator')<CR>
     map <silent> <S-F9> :python toggle_reselect()<CR>
     "map <silent> <C-F6> :python send('%pdb')<CR>
     "map <silent> <F6> :python set_breakpoint()<CR>
