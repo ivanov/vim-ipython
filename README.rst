@@ -214,6 +214,16 @@ Thanks and Bug Participation
 
 Similar Projects
 ----------------
-https://github.com/jpalardy/vim-slime - Grab some text and "send" it to a GNU Screen / tmux session.
-http://www.vim.org/scripts/script.php?script_id=2711 - same as above, but looks more integrated
-http://code.google.com/p/conque/ - terminal emulator which uses a Vim buffer to display the program output.
+* `vim-slime`_ - Grab some text and "send" it to a GNU Screen / tmux session
+  (Jonathan Palardy)
+* `screen.vba`_ - Simulate a split shell, using GNU Screen / tmux, that you
+  can send commands to (Eric Van Dewoestine)
+* conque_ - terminal emulator which uses a Vim buffer to display the program
+  output (Nico Raffo)
+* `ipyqtmacvim`_ - plugin to send commands from MacVim to IPython Qt console
+  (Justin Kitzes)
+
+.. _vim-slime: https://github.com/jpalardy/vim-slime
+.. _screen.vba: https://github.com/ervandew/screen
+.. _conque: http://code.google.com/p/conque/
+.. _ipyqtmacvim: https://github.com/jkitzes/ipyqtmacvim/
