@@ -117,6 +117,13 @@ def km_from_string(s=''):
 
     # now that we're connect to an ipython kernel, activate completion machinery
     vim.command('set completefunc=CompleteIPython')
+    # also activate GUI doc balloons if in gvim
+    vim.command("""
+        if has('balloon_eval')
+            set bexpr=IPythonBalloonExpr()
+            set ballooneval
+        endif
+        """)
     set_pid()
     return km
 
@@ -575,10 +582,6 @@ vim.command("let l:doc = %s"% reply)
 endpython
 return l:doc
 endfunction
-if has('balloon_eval')
-    set bexpr=IPythonBalloonExpr()
-    set ballooneval
-endif
 
 fun! CompleteIPython(findstart, base)
       if a:findstart
