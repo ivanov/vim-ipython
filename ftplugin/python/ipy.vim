@@ -142,7 +142,7 @@ def disconnect():
 
 def get_doc(word):
     if km is None:
-        return ["Not connected to IPython, cannot query \"%s\"" %word]
+        return ["Not connected to IPython, cannot query: %s" % word]
     msg_id = km.shell_channel.object_info(word)
     doc = get_doc_msg(msg_id)
     # get around unicode problems when interfacing with vim
@@ -186,7 +186,7 @@ def get_doc_buffer(level=0):
     word = vim.eval('expand("<cfile>")') or ''
     doc = get_doc(word)
     if len(doc) ==0:
-        echo(word+" not found","Error")
+        echo(repr(word)+" not found","Error")
         return
     # close any currently open preview windows
     vim.command('pcl')
