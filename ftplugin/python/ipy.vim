@@ -217,7 +217,7 @@ def vim_ipython_is_open():
     visible
     """
     for w in vim.windows:
-        if w.buffer.name.endswith("vim-ipython"):
+        if w.buffer.name is not None and w.buffer.name.endswith("vim-ipython"):
             return True
     return False
 
