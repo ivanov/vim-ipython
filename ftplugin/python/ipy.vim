@@ -22,6 +22,9 @@ if !has('python')
     " exit if python is not available.
     finish
 endif
+if !exists('g:ipy_local_copletefunc')
+    let g:ipy_local_copletefunc = 0
+endif
 python << EOF
 reselect = False            # reselect lines after sending from Visual mode
 show_execution_count = True # wait to get numbers for In[43]: feedback?
@@ -116,7 +119,10 @@ def km_from_string(s=''):
     send = km.shell_channel.execute
 
     # now that we're connect to an ipython kernel, activate completion machinery
-    vim.command('set completefunc=CompleteIPython')
+    if vim.command('g:ipy_local_copletefunc'):
+        vim.command('setl completefunc=CompleteIPython')
+    else:
+        vim.command('set completefunc=CompleteIPython')
     # also activate GUI doc balloons if in gvim
     vim.command("""
         if has('balloon_eval')

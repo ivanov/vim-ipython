@@ -152,6 +152,10 @@ In your own ``.vimrc``, if you don't like the mappings provided by default,
 you can define a variable ``let g:ipy_perform_mappings=0`` which will prevent
 vim-ipython from defining any of the default mappings.
 
+**Making autocompletion local to a buffer**
+Sometimes autocompletion from ipy breaks other plugins' completions - by setting a variable
+``let g:ipy_local_copletefunc`` vim will use ipy completion only for current buffer.
+
 ---------------
 Current issues:
 ---------------
