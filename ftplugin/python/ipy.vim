@@ -409,20 +409,18 @@ def set_pid():
     Explicitly ask the ipython kernel for its pid
     """
     global km, pid
-    lines = '\n'.join(['import os', 'os.getpid()'])
-    msg_id = send(lines)
+    lines = '\n'.join(['import os', '_pid = os.getpid()'])
+    msg_id = send(lines, silent=True, user_variables=['_pid'])
 
     # wait to get message back from kernel
     try:
         child = get_child_msg(msg_id)
     except Empty:
         echo("no reply from IPython kernel")
+        return
 
-    msgs = km.sub_channel.get_msgs()
-    msgs = (m for m in msgs if 'msg_type' in m['header'])
-    msgs = (m for m in msgs if m['header']['msg_type'] == 'pyout')
-    for m in msgs:
-        pid = int( m['content']['data']['text/plain'] )
+    pid = int(child['content']['user_variables']['_pid'])
+    return pid
 
 
 def interrupt_kernel_hack():
@@ -434,11 +432,21 @@ def interrupt_kernel_hack():
     global pid
     import signal
     import os
-    if pid:
-        echo("KeyboardInterrupt (sent to ipython: pid " + 
-            "%i with signal %i)" % (pid, signal.SIGINT),"Operator")
-    os.kill(pid, signal.SIGINT)
+    if pid is None:
+        # Avoid errors if we couldn't get pid originally,
+        # by trying to obtain it now
+        pid = set_pid()
 
+        if pid is None:
+            echo("cannot get kernel PID, Ctrl-C will not be supported")
+            return
+    echo("KeyboardInterrupt (sent to ipython: pid " +
+        "%i with signal %i)" % (pid, signal.SIGINT),"Operator")
+    try:
+        os.kill(pid, signal.SIGINT)
+    except OSError:
+        echo("unable to kill pid %d" % pid)
+        pid = None
 
 def dedent_run_this_line():
     vim.command("left")
