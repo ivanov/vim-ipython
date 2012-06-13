@@ -17,7 +17,6 @@
 "
 " written by Paul Ivanov (http://pirsquared.org)
 "
-" TODO: bufenter / bufleave autoevents for vim-ipython
 if !has('python')
     " exit if python is not available.
     finish

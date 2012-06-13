@@ -126,7 +126,6 @@ completion.
 -------------------
 vim-ipython 'shell'
 -------------------
-**NEW since IPython 0.11**!
 
 By monitoring km.sub_channel, we can recreate what messages were sent to
 IPython, and what IPython sends back in response.
@@ -136,6 +135,11 @@ updated on every sent command (default: True).
 
 If at any later time you wish to bring this shell up, including if you've set
 ``monitor_subchannel=False``, hit ``<leader>s``.
+
+**NEW since IPython 0.12**
+For local kernels (kernels running on the same machine as vim), `Ctrl-C` in
+the vim-ipython 'shell' sends an keyboard interrupt. (Note: this feature may
+not work on Windows, please report the issue to ).
 
 -------
 Options
@@ -152,6 +156,7 @@ In your own ``.vimrc``, if you don't like the mappings provided by default,
 you can define a variable ``let g:ipy_perform_mappings=0`` which will prevent
 vim-ipython from defining any of the default mappings.
 
+**NEW since IPython 0.12**
 **Making completefunc local to a buffer, or disabling it**
 By default, vim-ipython activates the custom completefunc globally.
 Sometimes, having a completefunc breaks other plugins' completions. Putting
@@ -204,7 +209,12 @@ Current issues:
 ----------------------------
 Thanks and Bug Participation
 ----------------------------
-* @MinRK for guiding me through the IPython kernel manager protocol.
+Here's a brief acknowledgment of the folks who have graciously pitched in. If
+you've been missed, don't hesitate to contact me, or better yet, submit a
+pull request with your attribution.
+
+* @minrk for guiding me through the IPython kernel manager protocol, and
+  support of connection_file-based IPython connection (#13)
 * @nakamuray and @tcheneau for reporting and providing a fix for when vim is
   compiled without a gui (#1)
 * @unpingco for reporting Windows bugs (#3,#4), providing better multiline
@@ -212,12 +222,19 @@ Thanks and Bug Participation
   resized (#16).
 * @simon-b for terminal vim arrow key issue (#5)
 * @jorgesca and @kwgoodman for shell update problems (#6)
+* @xowlinx and @vladimiroff for Ctrl-S issues in Konsole (#8)
 * @zeekay for easily allowing custom mappings (#9)
-* @minrk for support of connection_file-based IPython connection (#13)
-* @jorgesca for reporting the lack of profile handling capability (#14)
+* @jorgesca for reporting the lack of profile handling capability (#14),
+  only open updating 'shell' if it is open (#29)
 * @enzbang for removing mapping that's not currently functional (#17)
 * @ogrisel  for fixing documentation typo (#19)
-
+* @koepsell for gracefully exiting in case python is not available (#23)
+* @mrterry for activating completefunc only after a connection is made (#25),
+  Ctrl-C implementation in vim-ipython 'shell' (#28)
+* @nonameentername for completion on import statements (#26)
+* @dstahlke for setting syntax of doc window to ReST
+* @jtratner for docs with quotes (#30)
+* @pielgrzym for setting completefunc locally to a buffer (#32)
 
 Similar Projects
 ----------------
