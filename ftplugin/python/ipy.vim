@@ -22,9 +22,24 @@ if !has('python')
     " exit if python is not available.
     finish
 endif
+
+" Allow custom mappings.
+if !exists('g:ipy_perform_mappings')
+    let g:ipy_perform_mappings = 1
+endif
+
+" Register IPython completefunc
+" 'global'   -- for all of vim (default).
+" 'local'    -- only for the current buffer.
+" otherwise  -- don't register it at all.
+"
+" you can later set it using ':set completefunc=CompleteIPython', which will
+" correspond to the 'global' behavior, or with ':setl ...' to get the 'local'
+" behavior
 if !exists('g:ipy_completefunc')
     let g:ipy_completefunc = 'global'
 endif
+
 python << EOF
 reselect = False            # reselect lines after sending from Visual mode
 show_execution_count = True # wait to get numbers for In[43]: feedback?
@@ -549,10 +564,6 @@ au FocusGained *.*,vim-ipython :python if update_subchannel_msgs(): echo("vim-ip
 " displayed if vim-ipython buffer has been updated.
 au BufEnter vim-ipython :python if update_subchannel_msgs(): echo("vim-ipython shell updated (on buffer enter)",'Operator')
 
-" Allow custom mappings
-if !exists('g:ipy_perform_mappings')
-    let g:ipy_perform_mappings = 1
-endif
 if g:ipy_perform_mappings != 0
     map <silent> <F5> :python run_this_file()<CR>
     map <silent> <S-F5> :python run_this_line()<CR>
