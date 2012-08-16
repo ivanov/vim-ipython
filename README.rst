@@ -242,12 +242,17 @@ Similar Projects
   (Jonathan Palardy)
 * `screen.vba`_ - Simulate a split shell, using GNU Screen / tmux, that you
   can send commands to (Eric Van Dewoestine)
+* `vimux`_ - vim plugin to interact with tmux (Ben Mills)
+* `vimux-pyutils`_ - send code to tmux ipython session (Julien Rebetez)
 * conque_ - terminal emulator which uses a Vim buffer to display the program
   output (Nico Raffo)
 * `ipyqtmacvim`_ - plugin to send commands from MacVim to IPython Qt console
   (Justin Kitzes)
 
+
 .. _vim-slime: https://github.com/jpalardy/vim-slime
 .. _screen.vba: https://github.com/ervandew/screen
 .. _conque: http://code.google.com/p/conque/
+.. _vimux: https://github.com/benmills/vimux
+.. _vimux-pyutils: https://github.com/julienr/vimux-pyutis
 .. _ipyqtmacvim: https://github.com/jkitzes/ipyqtmacvim/
