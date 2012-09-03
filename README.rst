@@ -254,7 +254,7 @@ Similar Projects
 .. _screen.vba: https://github.com/ervandew/screen
 .. _conque: http://code.google.com/p/conque/
 .. _vimux: https://github.com/benmills/vimux
-.. _vimux-pyutils: https://github.com/julienr/vimux-pyutis
+.. _vimux-pyutils: https://github.com/julienr/vimux-pyutils
 .. _ipyqtmacvim: https://github.com/jkitzes/ipyqtmacvim/
 
 
