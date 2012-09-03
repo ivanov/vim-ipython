@@ -256,3 +256,12 @@ Similar Projects
 .. _vimux: https://github.com/benmills/vimux
 .. _vimux-pyutils: https://github.com/julienr/vimux-pyutis
 .. _ipyqtmacvim: https://github.com/jkitzes/ipyqtmacvim/
+
+
+Bottom Line
+-----------
+If you find this project useful, please consider donating money to the
+`John Hunter Memorial Fund`_. A giant in our community, John lead by example
+and gave us all so much. This is one small way we can give back to his family.
+
+.. _John Hunter Memorial Fund: http://numfocus.org/johnhunter/
