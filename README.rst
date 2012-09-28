@@ -26,26 +26,26 @@ If you can launch ``ipython qtconsole`` or ``ipython kernel``, and
 -----------------
 Quickstart Guide:
 -----------------
-Start ``ipython qtconsole`` [*]_ and copy the connection string.
-Source ``ipy.vim`` file, which provides new IPython command::
+Start ``ipython qtconsole`` [*]_. Source ``ipy.vim`` file, which provides new
+IPython command::
 
   :source ipy.vim
   (or copy it to ~/.vim/ftplugin/python to load automatically)
 
-  :IPythonClipboard
-  (or :IPythonXSelection if you're using X11 without having to copy)
+  :IPython
 
-The :IPython command allows you to put the full connection string. For IPython
-0.11, it would look like this::
+The ``:IPython`` command allows you to put the full connection string. For
+IPython 0.11, it would look like this::
 
   :IPython --existing --shell=41882 --iopub=43286 --stdin=34987 --hb=36697
 
-and for IPython 0.12, like this::
+and for IPython 0.12 and later, like this::
 
   :IPython --existing kernel-85997.json
 
-The ``:IPythonClipboard`` command just uses the ``+`` register to get the
-connection string, whereas ``:IPythonXSelection`` uses the ``*`` register.
+There also exists to convenience commands: ``:IPythonClipboard`` just uses the
+``+`` register to get the connection string, whereas ``:IPythonXSelection``
+uses the ``*`` register and passes it to ``:IPython``.
 
 **NEW in IPython 0.12**!
 Since IPython 0.12, you can simply use::
