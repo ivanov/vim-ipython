@@ -483,9 +483,11 @@ def dedent_run_these_lines():
     r = vim.current.range
     shiftwidth = vim.eval('&shiftwidth')
     count = int(vim.eval('indent(%d+1)/%s' % (r.start,shiftwidth)))
-    vim.command("'<,'>" + "<"*count)
+    if count > 0:
+       vim.command("'<,'>" + "<"*count)
     run_these_lines()
-    vim.command("silent undo")
+    if count > 0:
+       vim.command("silent undo")
     
 #def set_this_line():
 #    # not sure if there's a way to do this, since we have multiple clients
