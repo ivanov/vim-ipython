@@ -83,14 +83,27 @@ def km_from_string(s=''):
     or just 'kernel-12345.json' for IPython 0.12
     """
     from os.path import join as pjoin
-    from IPython.zmq.blockingkernelmanager import BlockingKernelManager, Empty
     from IPython.config.loader import KeyValueConfigLoader
-    from IPython.zmq.kernelapp import kernel_aliases
+    from Queue import Empty
+    try:
+        from IPython.kernel import (
+            BlockingKernelManager,
+            find_connection_file,
+        )
+    except ImportError:
+        # < 0.14
+        from IPython.zmq.blockingkernelmanager import BlockingKernelManager
+        from IPython.zmq.kernelapp import kernel_aliases
+        try:
+            from IPython.lib.kernel import find_connection_file
+        except ImportError:
+            # < 0.12, no find_connection_file
+            pass
+        
     global km,send,Empty
 
     s = s.replace('--existing', '')
     if 'connection_file' in BlockingKernelManager.class_trait_names():
-        from IPython.lib.kernel import find_connection_file
         # 0.12 uses files instead of a collection of ports
         # include default IPython search path
         # filefind also allows for absolute paths, in which case the search
