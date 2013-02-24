@@ -218,12 +218,12 @@ def get_doc_buffer(level=0):
     vim.command('new '+word)
     vim.command('setlocal modifiable noro')
     # doc window quick quit keys: 'q' and 'escape'
-    vim.command('map <buffer> q :q<CR>')
+    vim.command('nnoremap <buffer> q :q<CR>')
     # Known issue: to enable the use of arrow keys inside the terminal when
     # viewing the documentation, comment out the next line
-    vim.command('map <buffer> <Esc> :q<CR>')
+    vim.command('nnoremap <buffer> <Esc> :q<CR>')
     # and uncomment this line (which will work if you have a timoutlen set)
-    #vim.command('map <buffer> <Esc><Esc> :q<CR>')
+    #vim.command('nnoremap <buffer> <Esc><Esc> :q<CR>')
     b = vim.current.buffer
     b[:] = None
     b[:] = doc
@@ -286,18 +286,18 @@ def update_subchannel_msgs(debug=False, force=False):
             vim.command("silent pedit +set\ ma vim-ipython")
             vim.command("wincmd P") #switch to preview window
             # subchannel window quick quit key 'q'
-            vim.command('map <buffer> q :q<CR>')
+            vim.command('nnoremap <buffer> q :q<CR>')
             vim.command("set bufhidden=hide buftype=nofile ft=python")
             # make shift-enter and control-enter in insert mode behave same as in ipython notebook
             # shift-enter send the current line, control-enter send the line
             # but keeps it around for further editing.
-            vim.command("imap <buffer> <s-Enter> <esc>dd:python run_command('''<C-r>\"''')<CR>i")
+            vim.command("inoremap <buffer> <s-Enter> <esc>dd:python run_command('''<C-r>\"''')<CR>i")
             # pkddA: paste, go up one line which is blank after run_command,
             # delete it, and then back to insert mode
-            vim.command("imap <buffer> <c-Enter> <esc>dd:python run_command('''<C-r>\"''')<CR>pkddA")
+            vim.command("inoremap <buffer> <c-Enter> <esc>dd:python run_command('''<C-r>\"''')<CR>pkddA")
             # ctrl-C gets sent to the IPython process as a signal on POSIX
-            vim.command("map <buffer>  :IPythonInterrupt<cr>")
-    
+            vim.command("noremap <buffer>  :IPythonInterrupt<cr>")
+
     #syntax highlighting for python prompt
     # QtConsole In[] is blue, but I prefer the oldschool green
     # since it makes the vim-ipython 'shell' look like the holidays!
