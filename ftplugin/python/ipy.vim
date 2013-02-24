@@ -572,11 +572,11 @@ noremap  <Plug>(IPython-RunLines)           :python run_these_lines()<CR>
 noremap  <Plug>(IPython-OpenPyDoc)          :python get_doc_buffer()<CR>
 noremap  <Plug>(IPython-UpdateShell)        :python if update_subchannel_msgs(force=True): echo("vim-ipython shell updated",'Operator')<CR>
 noremap  <Plug>(IPython-ToggleReselect)     :python toggle_reselect()<CR>
-noremap  <Plug>(IPython-StartDebugging)     :python send('%pdb')<CR>
-noremap  <Plug>(IPython-BreakpointSet)      :python set_breakpoint()<CR>
-noremap  <Plug>(IPython-BreakpointClear)    :python clear_breakpoint()<CR>
-noremap  <Plug>(IPython-DebugThisFile)      :python run_this_file_pdb()<CR>
-noremap  <Plug>(IPython-BreakpointClearAll) :python clear_all_breaks()<CR>
+"noremap  <Plug>(IPython-StartDebugging)     :python send('%pdb')<CR>
+"noremap  <Plug>(IPython-BreakpointSet)      :python set_breakpoint()<CR>
+"noremap  <Plug>(IPython-BreakpointClear)    :python clear_breakpoint()<CR>
+"noremap  <Plug>(IPython-DebugThisFile)      :python run_this_file_pdb()<CR>
+"noremap  <Plug>(IPython-BreakpointClearAll) :python clear_all_breaks()<CR>
 noremap  <Plug>(IPython-ToggleSendOnSave)   :call <SID>toggle_send_on_save()<CR>
 noremap  <Plug>(IPython-PlotClearCurrent)   :python run_command("plt.clf()")<CR>
 noremap  <Plug>(IPython-PlotCloseAll)       :python run_command("plt.close('all')")<CR>
