@@ -248,6 +248,7 @@ Similar Projects
   output (Nico Raffo)
 * `ipyqtmacvim`_ - plugin to send commands from MacVim to IPython Qt console
   (Justin Kitzes)
+* `tslime_ipython`_ - "cell" execution , with cells defined by marks
 
 
 .. _vim-slime: https://github.com/jpalardy/vim-slime
@@ -256,6 +257,7 @@ Similar Projects
 .. _vimux: https://github.com/benmills/vimux
 .. _vimux-pyutils: https://github.com/julienr/vimux-pyutils
 .. _ipyqtmacvim: https://github.com/jkitzes/ipyqtmacvim/
+.. _tslime_ipython: https://github.com/eldridgejm/tslime_ipython
 
 
 Bottom Line
