@@ -144,6 +144,10 @@ def km_from_string(s=''):
             return
     km.start_channels()
     send = km.shell_channel.execute
+    
+    #XXX: backwards compatability for IPython < 1.0
+    if not hasattr(km, 'iopub_channel'):
+        km.iopub_channel = km.sub_channel
 
     # now that we're connect to an ipython kernel, activate completion
     # machinery, but do so only for the local buffer if the user added the
@@ -268,7 +272,7 @@ def update_subchannel_msgs(debug=False, force=False):
     """
     if km is None or (not vim_ipython_is_open() and not force):
         return False
-    msgs = km.sub_channel.get_msgs()
+    msgs = km.iopub_channel.get_msgs()
     if debug:
         #try:
         #    vim.command("b debug_msgs")
