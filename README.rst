@@ -206,6 +206,10 @@ Current issues:
   ``monitor_subchannel`` is set. This is a bug in minibufexpl.vim and the workaround
   is described in vim-ipython issue #7.
 
+- the vim-ipython buffer is set to filetype=python, which provides syntax
+  highlighting, but that syntax highlighting will be broken if a stack trace
+  is returned which contains one half of a quote delimiter.
+
 ----------------------------
 Thanks and Bug Participation
 ----------------------------
