@@ -226,7 +226,10 @@ def get_doc_msg(msg_id):
 
 def get_doc_buffer(level=0):
     # empty string in case vim.eval return None
-    word = vim.eval('expand("<cfile>")') or ''
+    vim.command("let isk_save = &isk") # save iskeyword list
+    vim.command("let &isk = '@,48-57,_,192-255,.'")
+    word = vim.eval('expand("<cword>")') or ''
+    vim.command("let &isk = isk_save") # restore iskeyword list
     doc = get_doc(word)
     if len(doc) ==0:
         echo(repr(word)+" not found","Error")
