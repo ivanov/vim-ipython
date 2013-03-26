@@ -218,7 +218,8 @@ you've been missed, don't hesitate to contact me, or better yet, submit a
 pull request with your attribution.
 
 * @minrk for guiding me through the IPython kernel manager protocol, and
-  support of connection_file-based IPython connection (#13)
+  support of connection_file-based IPython connection (#13), and keeping
+  vim-ipython working across IPython API changes.
 * @nakamuray and @tcheneau for reporting and providing a fix for when vim is
   compiled without a gui (#1)
 * @unpingco for reporting Windows bugs (#3,#4), providing better multiline
@@ -239,6 +240,8 @@ pull request with your attribution.
 * @dstahlke for setting syntax of doc window to ReST
 * @jtratner for docs with quotes (#30)
 * @pielgrzym for setting completefunc locally to a buffer (#32)
+* @flacjacket for pointing out and providing fix for IPython API change
+* @memeplex for fixing the identifier grabbing on e.g. non-PEP8 compliant code
 
 Similar Projects
 ----------------
