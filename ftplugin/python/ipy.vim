@@ -65,6 +65,29 @@ except AttributeError:
     sys.stdout = WithFlush(sys.stdout)
     sys.stderr = WithFlush(sys.stderr)
 
+def vim_variable(name, default=None):
+    exists = int(vim.eval("exists('%s')" % name))
+    return vim.eval(name) if exists else default
+ 
+def vim_regex_escape(x):
+    for old, new in (("[", "\\["), ("]", "\\]"), (":", "\\:"), (".", "\."), ("*", "\\*")):
+        x = x.replace(old, new)
+    return x
+
+# status buffer settings
+status_prompt_in = vim_variable('g:ipy_status_in', 'In [%(line)d]: ')
+status_prompt_out = vim_variable('g:ipy_status_out', 'Out[%(line)d]: ')
+
+status_prompt_colors = {
+    'in_ctermfg': vim_variable('g:ipy_status_in_console_color', 'Green'),
+    'in_guifg': vim_variable('g:ipy_status_in_gui_color', 'Green'),
+    'out_ctermfg': vim_variable('g:ipy_status_out_console_color', 'Red'),
+    'out_guifg': vim_variable('g:ipy_status_out_gui_color', 'Red'),
+    'out2_ctermfg': vim_variable('g:ipy_status_out2_console_color', 'Gray'),
+    'out2_guifg': vim_variable('g:ipy_status_out2_gui_color', 'Gray'),
+}
+
+status_blank_lines = int(vim_variable('g:ipy_status_blank_lines', '1'))
 
 
 ip = '127.0.0.1'
@@ -308,6 +331,9 @@ def update_subchannel_msgs(debug=False, force=False):
             # subchannel window quick quit key 'q'
             vim.command('map <buffer> q :q<CR>')
             vim.command("set bufhidden=hide buftype=nofile ft=python")
+            vim.command("setlocal nobuflisted") # don't come up in buffer lists
+            vim.command("setlocal nonumber") # no line numbers, we have in/out nums
+            vim.command("setlocal noswapfile") # no swap file (so no complaints cross-instance)
             # make shift-enter and control-enter in insert mode behave same as in ipython notebook
             # shift-enter send the current line, control-enter send the line
             # but keeps it around for further editing.
@@ -321,12 +347,15 @@ def update_subchannel_msgs(debug=False, force=False):
     #syntax highlighting for python prompt
     # QtConsole In[] is blue, but I prefer the oldschool green
     # since it makes the vim-ipython 'shell' look like the holidays!
-    #vim.command("hi Blue ctermfg=Blue guifg=Blue")
-    vim.command("hi Green ctermfg=Green guifg=Green")
-    vim.command("hi Red ctermfg=Red guifg=Red")
-    vim.command("syn keyword Green 'In\ []:'")
-    vim.command("syn match Green /^In \[[0-9]*\]\:/")
-    vim.command("syn match Red /^Out\[[0-9]*\]\:/")
+    colors = status_prompt_colors
+    vim.command("hi IPyPromptIn ctermfg=%s guifg=%s" % (colors['in_ctermfg'], colors['in_guifg']))
+    vim.command("hi IPyPromptOut ctermfg=%s guifg=%s" % (colors['out_ctermfg'], colors['out_guifg']))
+    vim.command("hi IPyPromptOut2 ctermfg=%s guifg=%s" % (colors['out2_ctermfg'], colors['out2_guifg']))
+    in_expression = vim_regex_escape(status_prompt_in % {'line': 999}).replace('999', '[ 0-9]*')
+    vim.command("syn match IPyPromptIn /^%s/" % in_expression)
+    out_expression = vim_regex_escape(status_prompt_out % {'line': 999}).replace('999', '[ 0-9]*')
+    vim.command("syn match IPyPromptOut /^%s/" % out_expression)
+    vim.command("syn match IPyPromptOut2 /^\\.\\.\\.* /")
     b = vim.current.buffer
     update_occured = False
     for m in msgs:
@@ -342,18 +371,20 @@ def update_subchannel_msgs(debug=False, force=False):
         elif m['header']['msg_type'] == 'stream':
             s = strip_color_escapes(m['content']['data'])
         elif m['header']['msg_type'] == 'pyout':
-            s = "Out[%d]: " % m['content']['execution_count']
+            s = status_prompt_out % {'line': m['content']['execution_count']}
             s += m['content']['data']['text/plain']
         elif m['header']['msg_type'] == 'pyin':
             # TODO: the next line allows us to resend a line to ipython if
             # %doctest_mode is on. In the future, IPython will send the
             # execution_count on subchannel, so this will need to be updated
             # once that happens
-            if 'execution_count' in m['content']:
-                s = "\nIn [%d]: "% m['content']['execution_count']
-            else:
-                s = "\nIn [00]: "
-            s += m['content']['code'].strip()
+            line_number = m['content'].get('execution_count', 0)
+            prompt = status_prompt_in % {'line': line_number}
+            s = prompt
+            # add a continuation line (with trailing spaces if the prompt has them)
+            dots = '.' * len(prompt.rstrip())
+            dots += prompt[len(prompt.rstrip()):]
+            s += m['content']['code'].rstrip().replace('\n', '\n' + dots)
         elif m['header']['msg_type'] == 'pyerr':
             c = m['content']
             s = "\n".join(map(strip_color_escapes,c['traceback']))
@@ -371,8 +402,9 @@ def update_subchannel_msgs(debug=False, force=False):
                 b.append([l.encode(vim_encoding) for l in s.splitlines()])
         update_occured = True
     # make a newline so we can just start typing there
-    if b[-1] != '':
-        b.append([''])
+    if status_blank_lines:
+        if b[-1] != '':
+            b.append([''])
     vim.command('normal G') # go to the end of the file
     if not startedin_vimipython:
         vim.command('normal p') # go back to where you were
