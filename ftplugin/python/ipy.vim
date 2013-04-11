@@ -340,6 +340,9 @@ def update_subchannel_msgs(debug=False, force=False):
         elif m['header']['msg_type'] == 'status':
             continue
         elif m['header']['msg_type'] == 'stream':
+            # TODO: alllow for distinguishing between stdout and stderr (using
+            # custom syntax markers in the vim-ipython buffer perhaps), or by
+            # also echoing the message to the status bar
             s = strip_color_escapes(m['content']['data'])
         elif m['header']['msg_type'] == 'pyout':
             s = "Out[%d]: " % m['content']['execution_count']
