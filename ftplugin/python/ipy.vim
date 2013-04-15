@@ -183,10 +183,10 @@ def disconnect():
     # XXX: make a prompt here if this km owns the kernel
     pass
 
-def get_doc(word):
+def get_doc(word, level=0):
     if km is None:
         return ["Not connected to IPython, cannot query: %s" % word]
-    msg_id = km.shell_channel.object_info(word)
+    msg_id = km.shell_channel.object_info(word, level)
     doc = get_doc_msg(msg_id)
     # get around unicode problems when interfacing with vim
     return [d.encode(vim_encoding) for d in doc]
@@ -230,7 +230,7 @@ def get_doc_buffer(level=0):
     vim.command("let &isk = '@,48-57,_,192-255,.'")
     word = vim.eval('expand("<cword>")') or ''
     vim.command("let &isk = isk_save") # restore iskeyword list
-    doc = get_doc(word)
+    doc = get_doc(word, level)
     if len(doc) ==0:
         echo(repr(word)+" not found","Error")
         return
@@ -254,8 +254,12 @@ def get_doc_buffer(level=0):
     #vim.command('pcl')
     #vim.command('pedit doc')
     #vim.command('normal ') # go to previous window
-    # use the ReST formatting that ships with stock vim
-    vim.command('setlocal syntax=rst')
+    if level == 0:
+        # use the ReST formatting that ships with stock vim
+        vim.command('setlocal syntax=rst')
+    else:
+        # use Python syntax highlighting
+        vim.command('setlocal syntax=python')
 
 def vim_ipython_is_open():
     """
@@ -432,7 +436,13 @@ def run_this_line():
         original_pos =  w.cursor
         new_pos = (original_pos[0], vim.current.line.index('?')-1)
         w.cursor = new_pos
-        get_doc_buffer()
+        if vim.current.line.strip().endswith('??'):
+            # double question mark should display source
+            # XXX: it's not clear what level=2 is for, level=1 is sufficient
+            # to get the code -- follow up with IPython team on this
+            get_doc_buffer(1)
+        else:
+            get_doc_buffer()
         w.cursor = original_pos
         return
     msg_id = send(vim.current.line)
