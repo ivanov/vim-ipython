@@ -425,6 +425,16 @@ def run_this_file():
 
 @with_subchannel
 def run_this_line():
+    if vim.current.line.strip().endswith('?'):
+        # intercept question mark queries -- move to the word just before the
+        # question mark and call the get_doc_buffer on it
+        w = vim.current.window
+        original_pos =  w.cursor
+        new_pos = (original_pos[0], vim.current.line.index('?')-1)
+        w.cursor = new_pos
+        get_doc_buffer()
+        w.cursor = original_pos
+        return
     msg_id = send(vim.current.line)
     print_prompt(vim.current.line, msg_id)
 
