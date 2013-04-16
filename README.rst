@@ -164,6 +164,35 @@ the line ``let g:ipy_completefunc = 'local'`` in one's vimrc will activate the
 IPython-based completion only for current buffer. Setting `g:ipy_completefunc`
 to anything other than `'local'` or `'global'` disables it altogether.
 
+**NEW since IPython 0.13**
+
+**Sending ? and ?? now works just like IPython**
+This is only supported for single lines that end with ? and ??, which works
+just the same as it does in IPython (The ?? variant will show the code, not
+just the docstring
+
+**Sending arbitrary signal to IPython kernel**
+`:IPythonInterrupt` now supports sending of arbitrary signals. There's a
+convenience alias for sending SIGTERM via `:IPythonTerminate`, but you can
+also send any signal by just passing an argument to `:IPythonInterrupt`.
+Here's an example. First, send this code (or just run it in your kernel)::
+
+    import signal
+    def greeting_user(signum, stack):
+        import sys
+        sys.stdout.flush()
+        print "Hello, USER!"
+        sys.stdout.flush()
+    signal.signal(signal.SIGUSR1, greeting_user)
+
+Now, proceed to connect up using vim-ipython and run `:IPythonInterrupt 10` -
+where 10 happens to be signal.SIGUSR1 in the POSIX world. This functionality,
+along with the sourcing of profile-dependent code on startup (
+``vi `ipython locate profile default`/startup/README`` ), brings the forgotten
+world of inter-process communication through signals to your favorite text
+editor and REPL combination.
+
+
 ---------------
 Current issues:
 ---------------
@@ -242,6 +271,7 @@ pull request with your attribution.
 * @pielgrzym for setting completefunc locally to a buffer (#32)
 * @flacjacket for pointing out and providing fix for IPython API change
 * @memeplex for fixing the identifier grabbing on e.g. non-PEP8 compliant code
+* @pydave for IPythonTerminate (sending SIGTERM using our hack)
 
 Similar Projects
 ----------------
