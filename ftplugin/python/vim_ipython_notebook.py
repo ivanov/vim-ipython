@@ -205,9 +205,9 @@ def cells_from_buffers(buffers):
         if 'pyerr' in b.name:
             # the last line of the traceback is the evalue
             evalue = b[-1][b[-1].index(': ')+2:]
-            etype = b.name[b.name.index('pyerr') +len('pyerr') +1:]
+            ename = b.name[b.name.index('pyerr') +len('pyerr') +1:]
             sub_cell = current.new_output('pyerr',
-                    traceback=b[:], etype=etype, evalue=evalue)
+                    traceback=b[:], ename=ename, evalue=evalue)
             cell.outputs.append(sub_cell)
         if 'std' in b.name:
             stream = b.name[b.name.index('std'):b.name.rindex('[')]
