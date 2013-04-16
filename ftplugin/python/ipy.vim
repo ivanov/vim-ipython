@@ -493,13 +493,18 @@ def set_pid():
 
 
 def interrupt_kernel_hack():
+    import signal
+    send_kernel_interrupt(signal.SIGINT)
+def terminate_kernel_hack():
+    import signal
+    send_kernel_interrupt(signal.SIGTERM)
+def send_kernel_interrupt(signal_to_send):
     """
     Sends the interrupt signal to the remote kernel.  This side steps the
     (non-functional) ipython interrupt mechanisms.
     Only works on posix.
     """
     global pid
-    import signal
     import os
     if pid is None:
         # Avoid errors if we couldn't get pid originally,
@@ -510,9 +515,9 @@ def interrupt_kernel_hack():
             echo("cannot get kernel PID, Ctrl-C will not be supported")
             return
     echo("KeyboardInterrupt (sent to ipython: pid " +
-        "%i with signal %i)" % (pid, signal.SIGINT),"Operator")
+        "%i with signal %i)" % (pid, signal_to_send),"Operator")
     try:
-        os.kill(pid, signal.SIGINT)
+        os.kill(pid, signal_to_send)
     except OSError:
         echo("unable to kill pid %d" % pid)
         pid = None
@@ -646,6 +651,7 @@ command! -nargs=* IPython :py km_from_string("<args>")
 command! -nargs=0 IPythonClipboard :py km_from_string(vim.eval('@+'))
 command! -nargs=0 IPythonXSelection :py km_from_string(vim.eval('@*'))
 command! -nargs=0 IPythonInterrupt :py interrupt_kernel_hack()
+command! -nargs=0 IPythonTerminate :py terminate_kernel_hack()
 
 function! IPythonBalloonExpr()
 python << endpython
