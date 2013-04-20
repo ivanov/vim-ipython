@@ -172,7 +172,7 @@ def handle_image(bufname, img_source):
     output = tempfile.NamedTemporaryFile(delete=False)
     input = tempfile.NamedTemporaryFile(prefix=bufname)
     input.file.write(img_source)
-    base64.decode(file('/tmp/crazyidea'), output.file)
+    #base64.decode(file('/tmp/crazyidea'), output.file)
     vim.command("autocmd BufEnter %s :!qiv %s" % (bufname, output.name))
 
 def write_notebook(filename):
