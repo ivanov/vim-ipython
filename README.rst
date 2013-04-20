@@ -194,10 +194,11 @@ editor and REPL combination.
 
 
 ---------------
-Current issues:
+Known issues:
 ---------------
 - For now, vim-ipython only connects to an ipython session in progress.
-- The ipdb integration is not yet re-implemented.
+- The ipdb integration is not yet re-implemented. Pending 
+  [IPython PR #3089](https://github.com/ipython/ipython/pull/3089)
 - If you're running inside ``screen``, read about the ``<CTRL-S>`` issue `here
   <http://munkymorgy.blogspot.com/2008/07/screen-ctrl-s-bug.html>`_, and add
   this line to your ``.bashrc`` to fix it::
@@ -238,6 +239,8 @@ Current issues:
 - the vim-ipython buffer is set to filetype=python, which provides syntax
   highlighting, but that syntax highlighting will be broken if a stack trace
   is returned which contains one half of a quote delimiter.
+
+- vim-ipython is currently for Python2.X only.
 
 ----------------------------
 Thanks and Bug Participation
