@@ -386,7 +386,8 @@ def update_subchannel_msgs(debug=False, force=False):
     # make a newline so we can just start typing there
     if b[-1] != '':
         b.append([''])
-    vim.command('normal G') # go to the end of the file
+    if update_occured or force:
+        vim.command('normal G') # go to the end of the file
     if not startedin_vimipython:
         vim.command('normal p') # go back to where you were
     return update_occured
