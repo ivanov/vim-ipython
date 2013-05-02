@@ -450,6 +450,8 @@ def run_this_line():
             get_doc_buffer(1)
         else:
             get_doc_buffer()
+        # leave insert mode, so we're in command mode
+        vim.command('stopi')
         w.cursor = original_pos
         return
     msg_id = send(vim.current.line)
