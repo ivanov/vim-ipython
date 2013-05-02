@@ -70,11 +70,11 @@ except AttributeError:
 ip = '127.0.0.1'
 try:
     km
-except NameError:
-    km = None
-try:
+    kc
     pid
 except NameError:
+    km = None
+    kc = None
     pid = None
 
 def km_from_string(s=''):
@@ -87,12 +87,12 @@ def km_from_string(s=''):
     from Queue import Empty
     try:
         from IPython.kernel import (
-            BlockingKernelManager,
+            KernelManager,
             find_connection_file,
         )
     except ImportError:
-        # < 0.14
-        from IPython.zmq.blockingkernelmanager import BlockingKernelManager
+        #  IPython < 1.0
+        from IPython.zmq.blockingkernelmanager import BlockingKernelManager as KernelManager
         from IPython.zmq.kernelapp import kernel_aliases
         try:
             from IPython.lib.kernel import find_connection_file
@@ -100,10 +100,10 @@ def km_from_string(s=''):
             # < 0.12, no find_connection_file
             pass
         
-    global km,send,Empty
+    global km, kc, send, Empty
 
     s = s.replace('--existing', '')
-    if 'connection_file' in BlockingKernelManager.class_trait_names():
+    if 'connection_file' in KernelManager.class_trait_names():
         # 0.12 uses files instead of a collection of ports
         # include default IPython search path
         # filefind also allows for absolute paths, in which case the search
@@ -124,7 +124,7 @@ def km_from_string(s=''):
             echo(":IPython " + s + " failed", "Info")
             echo("^-- failed '" + s + "' not found", "Error")
             return
-        km = BlockingKernelManager(connection_file = fullpath)
+        km = KernelManager(connection_file = fullpath)
         km.load_connection_file()
     else:
         if s == '':
@@ -133,7 +133,7 @@ def km_from_string(s=''):
         loader = KeyValueConfigLoader(s.split(), aliases=kernel_aliases)
         cfg = loader.load_config()['KernelApp']
         try:
-            km = BlockingKernelManager(
+            km = KernelManager(
                 shell_address=(ip, cfg['shell_port']),
                 sub_address=(ip, cfg['iopub_port']),
                 stdin_address=(ip, cfg['stdin_port']),
@@ -142,12 +142,18 @@ def km_from_string(s=''):
             echo(":IPython " +s + " failed", "Info")
             echo("^-- failed --"+e.message.replace('_port','')+" not specified", "Error")
             return
-    km.start_channels()
-    send = km.shell_channel.execute
+
+    try:
+        kc = km.client()
+    except AttributeError:
+        # 0.13
+        kc = km
+    kc.start_channels()
+    send = kc.shell_channel.execute
     
     #XXX: backwards compatability for IPython < 1.0
-    if not hasattr(km, 'iopub_channel'):
-        km.iopub_channel = km.sub_channel
+    if not hasattr(kc, 'iopub_channel'):
+        kc.iopub_channel = kc.sub_channel
 
     # now that we're connect to an ipython kernel, activate completion
     # machinery, but do so only for the local buffer if the user added the
@@ -184,9 +190,9 @@ def disconnect():
     pass
 
 def get_doc(word, level=0):
-    if km is None:
+    if kc is None:
         return ["Not connected to IPython, cannot query: %s" % word]
-    msg_id = km.shell_channel.object_info(word, level)
+    msg_id = kc.shell_channel.object_info(word, level)
     doc = get_doc_msg(msg_id)
     # get around unicode problems when interfacing with vim
     return [d.encode(vim_encoding) for d in doc]
@@ -277,9 +283,9 @@ def update_subchannel_msgs(debug=False, force=False):
     This function will do nothing if the vim-ipython shell is not visible,
     unless force=True argument is passed.
     """
-    if km is None or (not vim_ipython_is_open() and not force):
+    if kc is None or (not vim_ipython_is_open() and not force):
         return False
-    msgs = km.iopub_channel.get_msgs()
+    msgs = kc.iopub_channel.get_msgs()
     if debug:
         #try:
         #    vim.command("b debug_msgs")
@@ -389,7 +395,7 @@ def get_child_msg(msg_id):
     # XXX: message handling should be split into its own process in the future
     while True:
         # get_msg will raise with Empty exception if no messages arrive in 1 second
-        m= km.shell_channel.get_msg(timeout=1)
+        m = kc.shell_channel.get_msg(timeout=1)
         if m['parent_header']['msg_id'] == msg_id:
             break
         else:
@@ -418,7 +424,7 @@ def with_subchannel(f,*args):
             f(*args)
             if monitor_subchannel:
                 update_subchannel_msgs()
-        except AttributeError: #if km is None
+        except AttributeError: #if kc is None
             echo("not connected to IPython", 'Error')
     return f_with_update
 
@@ -477,7 +483,7 @@ def set_pid():
     """
     Explicitly ask the ipython kernel for its pid
     """
-    global km, pid
+    global pid
     lines = '\n'.join(['import os', '_pid = os.getpid()'])
     msg_id = send(lines, silent=True, user_variables=['_pid'])
 
@@ -684,7 +690,7 @@ endpython
         python << endpython
 base = vim.eval("a:base")
 findstart = vim.eval("a:findstart")
-msg_id = km.shell_channel.complete(base, current_line, vim.eval("col('.')"))
+msg_id = kc.shell_channel.complete(base, current_line, vim.eval("col('.')"))
 try:
     m = get_child_msg(msg_id)
     matches = m['content']['matches']
