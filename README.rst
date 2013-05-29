@@ -7,7 +7,7 @@ A two-way integration between Vim and IPython 0.11+
 * author: Paul Ivanov (http://pirsquared.org)
 * github: http://github.com/ivanov/vim-ipython
 * demos: http://pirsquared.org/vim-ipython/
-* blogpost: http://pirsquared.org/blog/2011/07/28/vim-ipython/
+* blogpost: http://pirsquared.org/blog/vim-ipython.html
 
 Using this plugin, you can send lines or whole files for IPython to
 execute, and also get back object introspection and word completions in
