@@ -193,7 +193,6 @@ def km_from_string(s=''):
     vim.command("""
         if has('balloon_eval')
             set bexpr=IPythonBalloonExpr()
-            set ballooneval
         endif
         """)
     set_pid()
