@@ -475,7 +475,7 @@ def run_this_line(dedent=False):
         # question mark and call the get_doc_buffer on it
         w = vim.current.window
         original_pos =  w.cursor
-        new_pos = (original_pos[0], line.index('?')-1)
+        new_pos = (original_pos[0], vim.current.line.index('?')-1)
         w.cursor = new_pos
         if line.rstrip().endswith('??'):
             # double question mark should display source
