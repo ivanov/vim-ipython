@@ -466,15 +466,18 @@ def run_this_file():
     print_prompt("In[]: run %s %s" % (run_flags, repr(vim.current.buffer.name)),msg_id)
 
 @with_subchannel
-def run_this_line():
-    if vim.current.line.strip().endswith('?'):
+def run_this_line(dedent=False):
+    line = vim.current.line
+    if dedent:
+        line = line.lstrip()
+    if line.rstrip().endswith('?'):
         # intercept question mark queries -- move to the word just before the
         # question mark and call the get_doc_buffer on it
         w = vim.current.window
         original_pos =  w.cursor
-        new_pos = (original_pos[0], vim.current.line.index('?')-1)
+        new_pos = (original_pos[0], line.index('?')-1)
         w.cursor = new_pos
-        if vim.current.line.strip().endswith('??'):
+        if line.rstrip().endswith('??'):
             # double question mark should display source
             # XXX: it's not clear what level=2 is for, level=1 is sufficient
             # to get the code -- follow up with IPython team on this
@@ -485,8 +488,8 @@ def run_this_line():
         vim.command('stopi')
         w.cursor = original_pos
         return
-    msg_id = send(vim.current.line)
-    print_prompt(vim.current.line, msg_id)
+    msg_id = send(line)
+    print_prompt(line, msg_id)
 
 @with_subchannel
 def run_command(cmd):
@@ -494,9 +497,18 @@ def run_command(cmd):
     print_prompt(cmd, msg_id)
 
 @with_subchannel
-def run_these_lines():
+def run_these_lines(dedent=False):
     r = vim.current.range
-    lines = "\n".join(vim.current.buffer[r.start:r.end+1])
+    if dedent:
+        lines = list(vim.current.buffer[r.start:r.end+1])
+        nonempty_lines = [x for x in lines if x.strip()]
+        if not nonempty_lines:
+            return
+        first_nonempty = nonempty_lines[0]
+        leading = len(first_nonempty) - len(first_nonempty.lstrip())
+        lines = "\n".join(x[leading:] for x in lines)
+    else:
+        lines = "\n".join(vim.current.buffer[r.start:r.end+1])
     msg_id = send(lines)
     #alternative way of doing this in more recent versions of ipython
     #but %paste only works on the local machine
@@ -566,19 +578,10 @@ def interrupt_kernel_hack(signal_to_send=None):
         pid = None
 
 def dedent_run_this_line():
-    vim.command("left")
-    run_this_line()
-    vim.command("silent undo")
+    run_this_line(True)
 
 def dedent_run_these_lines():
-    r = vim.current.range
-    shiftwidth = vim.eval('&shiftwidth')
-    count = int(vim.eval('indent(%d+1)/%s' % (r.start,shiftwidth)))
-    if count > 0:
-       vim.command("'<,'>" + "<"*count)
-    run_these_lines()
-    if count > 0:
-       vim.command("silent undo")
+    run_these_lines(True)
     
 #def set_this_line():
 #    # not sure if there's a way to do this, since we have multiple clients
