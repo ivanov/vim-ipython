@@ -168,6 +168,13 @@ to anything other than `'local'` or `'global'` disables it altogether.
 Current issues:
 ---------------
 - For now, vim-ipython only connects to an ipython session in progress.
+- The standard ipython clients (console, qtconsole, notebook) do not currently
+  display the result of computation which they did not initialize. This means
+  that if you send print statements for execution from within vim, they will
+  only be shown inside the vim-ipython shell buffer, but **not** within any of
+  the standard clients. This is not a limitation of vim-ipython, but a
+  limitation of those built-in clients, see `ipython/ipython#1873
+  <https://github.com/ipython/ipython/issues/1873>`_
 - The ipdb integration is not yet re-implemented.
 - If you're running inside ``screen``, read about the ``<CTRL-S>`` issue `here
   <http://munkymorgy.blogspot.com/2008/07/screen-ctrl-s-bug.html>`_, and add
