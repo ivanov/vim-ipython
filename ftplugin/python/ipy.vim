@@ -260,7 +260,7 @@ def get_doc_buffer(level=0):
     vim.command('resize %d'%len(b))
     #vim.command('pcl')
     #vim.command('pedit doc')
-    #vim.command('normal ') # go to previous window
+    #vim.command('normal! ') # go to previous window
     if level == 0:
         # use the ReST formatting that ships with stock vim
         vim.command('setlocal syntax=rst')
@@ -388,9 +388,9 @@ def update_subchannel_msgs(debug=False, force=False):
     if b[-1] != '':
         b.append([''])
     if update_occured or force:
-        vim.command('normal G') # go to the end of the file
+        vim.command('normal! G') # go to the end of the file
     if not startedin_vimipython:
-        vim.command('normal p') # go back to where you were
+        vim.command('normal! p') # go back to where you were
     return update_occured
     
 def get_child_msg(msg_id):
@@ -473,9 +473,9 @@ def run_these_lines():
     #vim.command("\"*yy")
     #send("'%paste')")
     #reselect the previously highlighted block
-    vim.command("normal gv")
+    vim.command("normal! gv")
     if not reselect:
-        vim.command("normal ")
+        vim.command("normal! ")
 
     #vim lines start with 1
     #print "lines %d-%d sent to ipython"% (r.start+1,r.end+1)
