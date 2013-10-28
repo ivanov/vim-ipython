@@ -9,11 +9,12 @@
 " -----------------
 " Quickstart Guide:
 " -----------------
-" Start ipython qtconsole and copy the connection string.
-" Source this file, which provides new IPython command
+" Start `ipython qtconsole`, `ipython console`, or  `ipython notebook` and
+" open a notebook using you web browser.  Source this file, which provides new
+" IPython command
+"
 "   :source ipy.vim
-"   :IPythonClipboard
-"   (or :IPythonXSelection if you're using X11 without having to copy)
+"   :IPython
 "
 " written by Paul Ivanov (http://pirsquared.org)
 "
