@@ -78,12 +78,25 @@ except NameError:
     kc = None
     pid = None
 
+_install_instructions = """You *must* install IPython into the Python that
+your vim is linked against. If you are seeing this message, this usually means
+either (1) installing IPython using the system Python that vim is using, or
+(2) recompiling Vim against the Python where you already have IPython
+installed. This is only a requirement to allow Vim to speak with an IPython
+instance using IPython's own machinery. It does *not* mean that the IPython
+instance with which you communicate via vim-ipython needs to be running the
+same version of Python.
+"""
 def km_from_string(s=''):
     """create kernel manager from IPKernelApp string
     such as '--shell=47378 --iopub=39859 --stdin=36778 --hb=52668' for IPython 0.11
     or just 'kernel-12345.json' for IPython 0.12
     """
     from os.path import join as pjoin
+    try:
+        import IPython
+    except ImportError:
+        raise ImportError("Could not find IPython. " + _install_instructions)
     from IPython.config.loader import KeyValueConfigLoader
     from Queue import Empty
     try:
@@ -432,8 +445,8 @@ def with_subchannel(f,*args):
 
 @with_subchannel
 def run_this_file():
-    msg_id = send('run %s %s' % (run_flags, repr(vim.current.buffer.name),))
-    print_prompt("In[]: run %s %s" % (run_flags, repr(vim.current.buffer.name)),msg_id)
+    msg_id = send('%%run %s %s' % (run_flags, repr(vim.current.buffer.name),))
+    print_prompt("In[]: %%run %s %s" % (run_flags, repr(vim.current.buffer.name)),msg_id)
 
 @with_subchannel
 def run_this_line():
