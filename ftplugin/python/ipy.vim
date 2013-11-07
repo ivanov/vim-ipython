@@ -448,7 +448,7 @@ def with_subchannel(f,*args):
         try:
             f(*args)
             if monitor_subchannel:
-                update_subchannel_msgs()
+                update_subchannel_msgs(force=True)
         except AttributeError: #if kc is None
             echo("not connected to IPython", 'Error')
     return f_with_update
