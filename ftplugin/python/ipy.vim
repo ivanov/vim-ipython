@@ -268,12 +268,12 @@ def get_doc_buffer(level=0):
     vim.command('new '+word)
     vim.command('setlocal modifiable noro')
     # doc window quick quit keys: 'q' and 'escape'
-    vim.command('map <buffer> q :q<CR>')
+    vim.command('nnoremap <buffer> q :q<CR>')
     # Known issue: to enable the use of arrow keys inside the terminal when
     # viewing the documentation, comment out the next line
-    vim.command('map <buffer> <Esc> :q<CR>')
+    vim.command('nnoremap <buffer> <Esc> :q<CR>')
     # and uncomment this line (which will work if you have a timoutlen set)
-    #vim.command('map <buffer> <Esc><Esc> :q<CR>')
+    #vim.command('nnoremap <buffer> <Esc><Esc> :q<CR>')
     b = vim.current.buffer
     b[:] = None
     b[:] = doc
@@ -340,18 +340,18 @@ def update_subchannel_msgs(debug=False, force=False):
             vim.command("silent pedit +set\ ma vim-ipython")
             vim.command("wincmd P") #switch to preview window
             # subchannel window quick quit key 'q'
-            vim.command('map <buffer> q :q<CR>')
+            vim.command('nnoremap <buffer> q :q<CR>')
             vim.command("set bufhidden=hide buftype=nofile ft=python")
             # make shift-enter and control-enter in insert mode behave same as in ipython notebook
             # shift-enter send the current line, control-enter send the line
             # but keeps it around for further editing.
-            vim.command("imap <buffer> <s-Enter> <esc>dd:python run_command('''<C-r>\"''')<CR>i")
+            vim.command("inoremap <buffer> <s-Enter> <esc>dd:python run_command('''<C-r>\"''')<CR>i")
             # pkddA: paste, go up one line which is blank after run_command,
             # delete it, and then back to insert mode
-            vim.command("imap <buffer> <c-Enter> <esc>dd:python run_command('''<C-r>\"''')<CR>pkddA")
+            vim.command("inoremap <buffer> <c-Enter> <esc>dd:python run_command('''<C-r>\"''')<CR>pkddA")
             # ctrl-C gets sent to the IPython process as a signal on POSIX
-            vim.command("map <buffer>  :IPythonInterrupt<cr>")
-    
+            vim.command("noremap <buffer>  :IPythonInterrupt<cr>")
+
     #syntax highlighting for python prompt
     # QtConsole In[] is blue, but I prefer the oldschool green
     # since it makes the vim-ipython 'shell' look like the holidays!
@@ -651,38 +651,57 @@ au FocusGained *.*,vim-ipython :python if update_subchannel_msgs(): echo("vim-ip
 " displayed if vim-ipython buffer has been updated.
 au BufEnter vim-ipython :python if update_subchannel_msgs(): echo("vim-ipython shell updated (on buffer enter)",'Operator')
 
+" Setup plugin mappings for the most common ways to interact with ipython.
+noremap  <Plug>(IPython-RunFile)            :python run_this_file()<CR>
+noremap  <Plug>(IPython-RunLine)            :python run_this_line()<CR>
+noremap  <Plug>(IPython-RunLines)           :python run_these_lines()<CR>
+noremap  <Plug>(IPython-OpenPyDoc)          :python get_doc_buffer()<CR>
+noremap  <Plug>(IPython-UpdateShell)        :python if update_subchannel_msgs(force=True): echo("vim-ipython shell updated",'Operator')<CR>
+noremap  <Plug>(IPython-ToggleReselect)     :python toggle_reselect()<CR>
+"noremap  <Plug>(IPython-StartDebugging)     :python send('%pdb')<CR>
+"noremap  <Plug>(IPython-BreakpointSet)      :python set_breakpoint()<CR>
+"noremap  <Plug>(IPython-BreakpointClear)    :python clear_breakpoint()<CR>
+"noremap  <Plug>(IPython-DebugThisFile)      :python run_this_file_pdb()<CR>
+"noremap  <Plug>(IPython-BreakpointClearAll) :python clear_all_breaks()<CR>
+noremap  <Plug>(IPython-ToggleSendOnSave)   :call <SID>toggle_send_on_save()<CR>
+noremap  <Plug>(IPython-PlotClearCurrent)   :python run_command("plt.clf()")<CR>
+noremap  <Plug>(IPython-PlotCloseAll)       :python run_command("plt.close('all')")<CR>
+noremap  <Plug>(IPython-RunLineAsTopLevel)  :python dedent_run_this_line()<CR>
+xnoremap <Plug>(IPython-RunLinesAsTopLevel) :python dedent_run_these_lines()<CR>
+
 if g:ipy_perform_mappings != 0
-    map <silent> <F5> :python run_this_file()<CR>
-    map <silent> <S-F5> :python run_this_line()<CR>
-    map <silent> <F9> :python run_these_lines()<CR>
-    map <silent> <leader>d :py get_doc_buffer()<CR>
-    map <silent> <leader>s :py if update_subchannel_msgs(force=True): echo("vim-ipython shell updated",'Operator')<CR>
-    map <silent> <S-F9> :python toggle_reselect()<CR>
-    "map <silent> <C-F6> :python send('%pdb')<CR>
-    "map <silent> <F6> :python set_breakpoint()<CR>
-    "map <silent> <s-F6> :python clear_breakpoint()<CR>
-    "map <silent> <F7> :python run_this_file_pdb()<CR>
-    "map <silent> <s-F7> :python clear_all_breaks()<CR>
-    imap <C-F5> <C-O><F5>
-    imap <S-F5> <C-O><S-F5>
-    imap <silent> <F5> <C-O><F5>
-    map <C-F5> :call <SID>toggle_send_on_save()<CR>
+    map  <buffer> <silent> <F5>           <Plug>(IPython-RunFile)
+    map  <buffer> <silent> <S-F5>         <Plug>(IPython-RunLine)
+    map  <buffer> <silent> <F9>           <Plug>(IPython-RunLines)
+    map  <buffer> <silent> <LocalLeader>d <Plug>(IPython-OpenPyDoc)
+    map  <buffer> <silent> <LocalLeader>s <Plug>(IPython-UpdateShell)
+    map  <buffer> <silent> <S-F9>         <Plug>(IPython-ToggleReselect)
+    "map  <buffer> <silent> <C-F6>         <Plug>(IPython-StartDebugging)
+    "map  <buffer> <silent> <F6>           <Plug>(IPython-BreakpointSet)
+    "map  <buffer> <silent> <S-F6>         <Plug>(IPython-BreakpointClear)
+    "map  <buffer> <silent> <F7>           <Plug>(IPython-DebugThisFile)
+    "map  <buffer> <silent> <S-F7>         <Plug>(IPython-BreakpointClearAll)
+    imap <buffer>          <C-F5>         <C-o><Plug>(IPython-RunFile)
+    imap <buffer>          <S-F5>         <C-o><Plug>(IPython-RunLines)
+    imap <buffer> <silent> <F5>           <C-o><Plug>(IPython-RunFile)
+    map  <buffer>          <C-F5>         <Plug>(IPython-ToggleSendOnSave)
     "" Example of how to quickly clear the current plot with a keystroke
-    "map <silent> <F12> :python run_command("plt.clf()")<cr>
+    "map  <buffer> <silent> <F12>          <Plug>(IPython-PlotClearCurrent)
     "" Example of how to quickly close all figures with a keystroke
-    "map <silent> <F11> :python run_command("plt.close('all')")<cr>
+    "map  <buffer> <silent> <F11>          <Plug>(IPython-PlotCloseAll)
 
     "pi custom
-    map <silent> <C-Return> :python run_this_file()<CR>
-    map <silent> <C-s> :python run_this_line()<CR>
-    imap <silent> <C-s> <C-O>:python run_this_line()<CR>
-    map <silent> <M-s> :python dedent_run_this_line()<CR>
-    vmap <silent> <C-S> :python run_these_lines()<CR>
-    vmap <silent> <M-s> :python dedent_run_these_lines()<CR>
-    map <silent> <M-c> I#<ESC>
-    vmap <silent> <M-c> I#<ESC>
-    map <silent> <M-C> :s/^\([ \t]*\)#/\1/<CR>
-    vmap <silent> <M-C> :s/^\([ \t]*\)#/\1/<CR>
+    map  <buffer> <silent> <C-Return>     <Plug>(IPython-RunFile)
+    map  <buffer> <silent> <C-s>          <Plug>(IPython-RunLine)
+    imap <buffer> <silent> <C-s>          <C-o><Plug>(IPython-RunLine)
+    map  <buffer> <silent> <M-s>          <Plug>(IPython-RunLineAsTopLevel)
+    xmap <buffer> <silent> <C-S>          <Plug>(IPython-RunLines)
+    xmap <buffer> <silent> <M-s>          <Plug>(IPython-RunLinesAsTopLevel)
+
+    noremap  <buffer> <silent> <M-c>      I#<ESC>
+    xnoremap <buffer> <silent> <M-c>      I#<ESC>
+    noremap  <buffer> <silent> <M-C>      :s/^\([ \t]*\)#/\1/<CR>
+    xnoremap <buffer> <silent> <M-C>      :s/^\([ \t]*\)#/\1/<CR>
 endif
 
 command! -nargs=* IPython :py km_from_string("<args>")
