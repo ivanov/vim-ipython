@@ -566,7 +566,7 @@ def set_pid():
     try:
         pid = int(child['content']['user_variables']['_pid'])
     except TypeError: # change in IPython 1.0.dev moved this out
-        pid = child['content']['user_variables']['_pid']['data']['text/plain']
+        pid = int(child['content']['user_variables']['_pid']['data']['text/plain'])
     return pid
 
 
