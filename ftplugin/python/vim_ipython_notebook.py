@@ -4,7 +4,7 @@ This file is intended to be imported and used inside vim, though some
 functions may have general utility outside of a vim context.
 
 TODO:
-    [ ] Metadata (notebook name)
+    [X] Metadata (notebook name)
     [ ] Header cells
     [X] Markdown cells
     [X] Code cells
@@ -84,10 +84,13 @@ def resize_and_switch():
     resize()
 
 def get_cells(fname):
+    # ok, this is fugly, but we'll take it out later once it works
+    global cur_nb
     with io.open(fname, 'r', encoding='utf-8') as f:
         fmt = 'json' if not fname.endswith('.py') else 'py'
         nb = current.read(f, fmt)
-    return nb.worksheets[0].cells
+    cur_nb = nb
+    return nb.worksheets[0].cells, nb
 
 vim_encoding=vim.eval('&encoding') or 'utf-8'
 def write_to_buffer(b, s):
@@ -113,7 +116,7 @@ def write_to_buffer(b, s):
 pnum = 'prompt_number'
 def notebook_to_vimbuffers(fname):
     "read an ipython notebook and spit it out as a bunch of vim buffers" 
-    cells = get_cells(fname)
+    cells, nb = get_cells(fname)
     #dir = tempfile.mkdtemp(prefix=fname)
     #vim.command("cd " + dir)
     for i, c in enumerate(cells):
@@ -130,6 +133,12 @@ def notebook_to_vimbuffers(fname):
             vim.command('set ft=markdown')
             write_to_buffer(vim.current.buffer, c['source'])
             vim.current.line
+    if nb.metadata:
+        i += 1 
+        vim.command("e %03d.metadata" % i) # ++ft=python")
+        vim.command('set buftype=nofile')
+        write_to_buffer(vim.current.buffer, eval(nb.metadata))
+        vim.current.line
     vim.command('brewind')
     vim.command('au BufEnter * :python resize_and_switch()')
 
@@ -177,7 +186,10 @@ def handle_image(bufname, img_source):
 
 def write_notebook(filename):
     cells = cells_from_buffers(vim.buffers)
-    nb = current.new_notebook(worksheets=[current.new_worksheet()])
+    metadata = eval(cells.pop())
+    print "Metadata", metadata
+    nb = current.new_notebook(worksheets=[current.new_worksheet()],
+            metadata=metadata)
     nb.worksheets[0].cells.extend(cells)
     with file(filename, 'w') as f:
         current.write(nb, f, 'json')
@@ -197,7 +209,7 @@ def cells_from_buffers(buffers):
             cell = current.new_code_cell("\n".join(b[:]),
                     prompt_number=in_number)
             cells.append(cell)
-        # XXX: Fragile: the sub_cell machinary relies on 'cell' being defined
+        # XXX: Fragile: the sub_cell machinery relies on 'cell' being defined
         # and works so long as the order of buffers preserves the appropriate
         # code cell being immediately adjacent to any of its outputs and
         # errors (This *WILL* be tricky once we allow for re-ordering of
@@ -221,5 +233,7 @@ def cells_from_buffers(buffers):
             sub_cell = current.new_output('pyout', "\n".join(b[:]),
                     prompt_number=in_number)
             cell.outputs.append(sub_cell)
-            pass
+        if 'metadata' in b.name:
+            cell = "\n".join(b[:])
+            cells.append(cell)
     return cells
