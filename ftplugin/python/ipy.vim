@@ -20,6 +20,7 @@
 "
 if !has('python')
     " exit if python is not available.
+    " XXX: raise an error message here
     finish
 endif
 
