@@ -568,6 +568,8 @@ def set_pid():
         pid = int(child['content']['user_variables']['_pid'])
     except TypeError: # change in IPython 1.0.dev moved this out
         pid = int(child['content']['user_variables']['_pid']['data']['text/plain'])
+    except KeyError: # change in IPython 1.0.dev moved this out
+        echo("Could not get PID information, kernel not running Python?")
     return pid
 
 
