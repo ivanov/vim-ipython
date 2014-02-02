@@ -99,7 +99,9 @@ def write_to_buffer(b, s):
         # every vim buffer has at least one line, and if it's blank, then
         # we'll want to delete it after appending `s` later on
         del_line0 = True
-    if s.find('\n') == -1:
+    if not hasattr(s, 'find'):
+        b.append(str(s))
+    elif s.find('\n') == -1:
         # somewhat ugly unicode workaround from 
         # http://vim.1045645.n5.nabble.com/Limitations-of-vim-python-interface-with-respect-to-character-encodings-td1223881.html
         if isinstance(s,unicode):
@@ -120,6 +122,7 @@ def notebook_to_vimbuffers(fname):
     #dir = tempfile.mkdtemp(prefix=fname)
     #vim.command("cd " + dir)
     for i, c in enumerate(cells):
+        print 'handling ', c['cell_type']
         if c['cell_type'] == 'code':
             in_number = '' if not hasattr(c, pnum) else c[pnum]
             vim.command("e %03d_In[%s]" % (i, in_number))
@@ -127,17 +130,21 @@ def notebook_to_vimbuffers(fname):
             vim.command('set ft=python')
             write_to_buffer(vim.current.buffer, c['input'])
             handle_outputs(c['outputs'], i, in_number)
-        if c['cell_type'] == 'markdown':
+        elif c['cell_type'] == 'markdown' or c['cell_type'] == 'heading':
             vim.command("e %03d.md" % i) # ++ft=python")
             vim.command('set buftype=nofile')
             vim.command('set ft=markdown')
             write_to_buffer(vim.current.buffer, c['source'])
-            vim.current.line
+            #vim.current.line
+            print c['cell_type']
+            vim.command('let b:cell_type="%s"' % c['cell_type'])
+        else:
+            print c['cell_type'], "ignored"
     if nb.metadata:
         i += 1 
         vim.command("e %03d.metadata" % i) # ++ft=python")
         vim.command('set buftype=nofile')
-        write_to_buffer(vim.current.buffer, eval(nb.metadata))
+        write_to_buffer(vim.current.buffer, nb.metadata)
         vim.current.line
     vim.command('brewind')
     vim.command('au BufEnter * :python resize_and_switch()')
@@ -197,10 +204,16 @@ def write_notebook(filename):
 def cells_from_buffers(buffers):
     cells = []
     for b in buffers:
-        if 'md' in b.name:
+        cell_type = vim.eval('b:cell_type')
+        print cell_type
+        if cell_type == 'heading':
+            print "got a heading cell!"
+            cell = current.new_heading_cell("\n".join(b[:]))
+            cells.append(cell)
+        elif 'md' in b.name:
             cell = current.new_text_cell('markdown', source="\n".join(b[:]))
             cells.append(cell)
-        if 'In' in b.name:
+        elif 'In' in b.name:
             in_number = b.name[b.name.rindex('[')+1:-1]
             try:
                 in_number = int(in_number)
@@ -214,14 +227,14 @@ def cells_from_buffers(buffers):
         # code cell being immediately adjacent to any of its outputs and
         # errors (This *WILL* be tricky once we allow for re-ordering of
         # cells, but we have to start somewhere)
-        if 'pyerr' in b.name:
+        elif 'pyerr' in b.name:
             # the last line of the traceback is the evalue
             evalue = b[-1][b[-1].index(': ')+2:]
             ename = b.name[b.name.index('pyerr') +len('pyerr') +1:]
             sub_cell = current.new_output('pyerr',
                     traceback=b[:], ename=ename, evalue=evalue)
             cell.outputs.append(sub_cell)
-        if 'std' in b.name:
+        elif 'std' in b.name:
             stream = b.name[b.name.index('std'):b.name.rindex('[')]
             sub_cell = current.new_output('stream', "\n".join(b[:]),
                     prompt_number=in_number)
@@ -229,11 +242,11 @@ def cells_from_buffers(buffers):
             # new_output_cell
             sub_cell['stream'] = stream
             cell.outputs.append(sub_cell)
-        if 'Out' in b.name:
+        elif 'Out' in b.name:
             sub_cell = current.new_output('pyout', "\n".join(b[:]),
                     prompt_number=in_number)
             cell.outputs.append(sub_cell)
-        if 'metadata' in b.name:
+        elif 'metadata' in b.name:
             cell = "\n".join(b[:])
             cells.append(cell)
     return cells
