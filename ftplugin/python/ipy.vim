@@ -400,17 +400,21 @@ def update_subchannel_msgs(debug=False, force=False):
             #echo('skipping a message on sub_channel','WarningMsg')
             #echo(str(m))
             continue
-        elif m['header']['msg_type'] == 'status':
+        header = m['header']['msg_type']
+        if header == 'status':
             continue
-        elif m['header']['msg_type'] == 'stream':
+        elif header == 'stream':
             # TODO: alllow for distinguishing between stdout and stderr (using
             # custom syntax markers in the vim-ipython buffer perhaps), or by
             # also echoing the message to the status bar
             s = strip_color_escapes(m['content']['data'])
-        elif m['header']['msg_type'] == 'pyout':
+        elif header == 'pyout':
             s = status_prompt_out % {'line': m['content']['execution_count']}
             s += m['content']['data']['text/plain']
-        elif m['header']['msg_type'] == 'pyin':
+        elif header == 'display_data':
+            # TODO: handle other display data types (HMTL? images?)
+            s += m['content']['data']['text/plain']
+        elif header == 'pyin':
             # TODO: the next line allows us to resend a line to ipython if
             # %doctest_mode is on. In the future, IPython will send the
             # execution_count on subchannel, so this will need to be updated
@@ -422,10 +426,11 @@ def update_subchannel_msgs(debug=False, force=False):
             dots = '.' * len(prompt.rstrip())
             dots += prompt[len(prompt.rstrip()):]
             s += m['content']['code'].rstrip().replace('\n', '\n' + dots)
-        elif m['header']['msg_type'] == 'pyerr':
+        elif header == 'pyerr':
             c = m['content']
             s = "\n".join(map(strip_color_escapes,c['traceback']))
             s += c['ename'] + ":" + c['evalue']
+
         if s.find('\n') == -1:
             # somewhat ugly unicode workaround from 
             # http://vim.1045645.n5.nabble.com/Limitations-of-vim-python-interface-with-respect-to-character-encodings-td1223881.html
