@@ -189,7 +189,7 @@ def km_from_string(s=''):
     kc.start_channels()
     send = kc.shell_channel.execute
 
-    #XXX: backwards compatability for IPython < 0.13
+    #XXX: backwards compatibility for IPython < 0.13
     import inspect
     sc = kc.shell_channel
     num_oinfo_args = len(inspect.getargspec(sc.object_info).args)
@@ -199,7 +199,7 @@ def km_from_string(s=''):
         klass._oinfo_orig = klass.object_info
         klass.object_info = lambda s,x,y: s._oinfo_orig(x)
     
-    #XXX: backwards compatability for IPython < 1.0
+    #XXX: backwards compatibility for IPython < 1.0
     if not hasattr(kc, 'iopub_channel'):
         kc.iopub_channel = kc.sub_channel
 
