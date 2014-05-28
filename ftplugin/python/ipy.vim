@@ -47,6 +47,7 @@ import sys
 vim_ipython_path = vim.eval("expand('<sfile>:h')")
 sys.path.append(vim_ipython_path)
 from vim_ipython import *
+
 EOF
 
 fun! <SID>toggle_send_on_save()
@@ -146,6 +147,7 @@ endif
 command! -nargs=* IPython :py km_from_string("<args>")
 command! -nargs=0 IPythonClipboard :py km_from_string(vim.eval('@+'))
 command! -nargs=0 IPythonXSelection :py km_from_string(vim.eval('@*'))
+command! -nargs=0 IPythonNew :py new_ipy()
 command! -nargs=* IPythonInterrupt :py interrupt_kernel_hack("<args>")
 command! -nargs=0 IPythonTerminate :py terminate_kernel_hack()
 

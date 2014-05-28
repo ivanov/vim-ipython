@@ -292,6 +292,7 @@ pull request with your attribution.
 * @flacjacket for pointing out and providing fix for IPython API change
 * @memeplex for fixing the identifier grabbing on e.g. non-PEP8 compliant code
 * @pydave for IPythonTerminate (sending SIGTERM using our hack)
+* @luispedro for IPythonNew
 
 Similar Projects
 ----------------

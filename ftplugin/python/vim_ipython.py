@@ -81,6 +81,18 @@ instance using IPython's own machinery. It does *not* mean that the IPython
 instance with which you communicate via vim-ipython needs to be running the
 same version of Python.
 """
+
+def new_ipy():
+    from random import random
+    from subprocess import Popen, PIPE
+    from time import sleep
+    import atexit
+    fname = "vim.ipython.%s.json" % (int(random()*100000))
+    p = Popen(["ipython", "kernel", "-f", fname], shell=False, stdout=PIPE, stdin=PIPE, stderr=PIPE)
+    atexit.register(p.kill)
+    sleep(3)
+    return km_from_string(fname)
+
 def km_from_string(s=''):
     """create kernel manager from IPKernelApp string
     such as '--shell=47378 --iopub=39859 --stdin=36778 --hb=52668' for IPython 0.11
