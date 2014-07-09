@@ -4,7 +4,10 @@ monitor_subchannel = True   # update vim-ipython 'shell' on every send?
 run_flags= "-i"             # flags to for IPython's run magic when using <F5>
 current_line = ''
 
-from Queue import Empty
+try:
+    from queue import Empty # python3 convention
+except ImportError:
+    from Queue import Empty
 
 try:
     import vim
@@ -13,7 +16,7 @@ except ImportError:
         def __getattribute__(self, key):
             return lambda *args: '0'
     vim = NoOp()
-    print "uh oh, not running inside vim"
+    print("uh oh, not running inside vim")
 
 import sys
 
@@ -87,7 +90,6 @@ def km_from_string(s=''):
     except ImportError:
         raise ImportError("Could not find IPython. " + _install_instructions)
     from IPython.config.loader import KeyValueConfigLoader
-    from Queue import Empty
     try:
         from IPython.kernel import (
             KernelManager,
@@ -103,7 +105,7 @@ def km_from_string(s=''):
             # < 0.12, no find_connection_file
             pass
         
-    global km, kc, send, Empty
+    global km, kc, send
 
     s = s.replace('--existing', '')
     if 'connection_file' in KernelManager.class_trait_names():
@@ -123,7 +125,7 @@ def km_from_string(s=''):
                 fullpath = find_connection_file(k,p)
             else:
                 fullpath = find_connection_file(s.lstrip().rstrip())
-        except IOError,e:
+        except IOError as e:
             echo(":IPython " + s + " failed", "Info")
             echo("^-- failed '" + s + "' not found", "Error")
             return
@@ -141,7 +143,7 @@ def km_from_string(s=''):
                 sub_address=(ip, cfg['iopub_port']),
                 stdin_address=(ip, cfg['stdin_port']),
                 hb_address=(ip, cfg['hb_port']))
-        except KeyError,e:
+        except KeyError as e:
             echo(":IPython " +s + " failed", "Info")
             echo("^-- failed --"+e.message.replace('_port','')+" not specified", "Error")
             return
@@ -194,7 +196,7 @@ def echo(arg,style="Question"):
         vim.command("echom \"%s\"" % arg.replace('\"','\\\"'))
         vim.command("echohl None")
     except vim.error:
-        print "-- %s" % arg
+        print("-- %s" % arg)
 
 def disconnect():
     "disconnect kernel manager"
@@ -532,7 +534,7 @@ def run_these_lines(dedent=False):
         vim.command("normal! ")
 
     #vim lines start with 1
-    #print "lines %d-%d sent to ipython"% (r.start+1,r.end+1)
+    #print("lines %d-%d sent to ipython"% (r.start+1,r.end+1))
     prompt = "lines %d-%d "% (r.start+1,r.end+1)
     print_prompt(prompt,msg_id)
 
@@ -602,30 +604,31 @@ def dedent_run_these_lines():
 #def set_this_line():
 #    # not sure if there's a way to do this, since we have multiple clients
 #    send("get_ipython().shell.set_next_input(\'%s\')" % vim.current.line.replace("\'","\\\'"))
-#    #print "line \'%s\' set at ipython prompt"% vim.current.line
+#    #print("line \'%s\' set at ipython prompt"% vim.current.line)
 #    echo("line \'%s\' set at ipython prompt"% vim.current.line,'Statement')
 
 
 def toggle_reselect():
     global reselect
     reselect=not reselect
-    print "F9 will%sreselect lines after sending to ipython"% (reselect and " " or " not ")
+    print("F9 will%sreselect lines after sending to ipython" %
+            (reselect and " " or " not "))
 
 #def set_breakpoint():
 #    send("__IP.InteractiveTB.pdb.set_break('%s',%d)" % (vim.current.buffer.name,
 #                                                        vim.current.window.cursor[0]))
-#    print "set breakpoint in %s:%d"% (vim.current.buffer.name, 
-#                                      vim.current.window.cursor[0])
+#    print("set breakpoint in %s:%d"% (vim.current.buffer.name, 
+#                                      vim.current.window.cursor[0]))
 #    
 #def clear_breakpoint():
 #    send("__IP.InteractiveTB.pdb.clear_break('%s',%d)" % (vim.current.buffer.name,
 #                                                          vim.current.window.cursor[0]))
-#    print "clearing breakpoint in %s:%d" % (vim.current.buffer.name,
-#                                            vim.current.window.cursor[0])
+#    print("clearing breakpoint in %s:%d" % (vim.current.buffer.name,
+#                                            vim.current.window.cursor[0]))
 #
 #def clear_all_breakpoints():
 #    send("__IP.InteractiveTB.pdb.clear_all_breaks()");
-#    print "clearing all breakpoints"
+#    print("clearing all breakpoints")
 #
 #def run_this_file_pdb():
 #    send(' __IP.InteractiveTB.pdb.run(\'execfile("%s")\')' % (vim.current.buffer.name,))
