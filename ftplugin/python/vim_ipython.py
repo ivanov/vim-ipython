@@ -62,6 +62,7 @@ status_blank_lines = int(vim_variable('g:ipy_status_blank_lines', '1'))
 
 
 ip = '127.0.0.1'
+# this allows us to load vim_ipython multiple times
 try:
     km
     kc
@@ -317,15 +318,6 @@ def update_subchannel_msgs(debug=False, force=False):
     if kc is None or (not vim_ipython_is_open() and not force):
         return False
     msgs = kc.iopub_channel.get_msgs()
-    if debug:
-        #try:
-        #    vim.command("b debug_msgs")
-        #except vim.error:
-        #    vim.command("new debug_msgs")
-        #finally:
-        db = vim.current.buffer
-    else:
-        db = []
     b = vim.current.buffer
     startedin_vimipython = vim.eval('@%')=='vim-ipython'
     if not startedin_vimipython:
@@ -377,7 +369,6 @@ def update_subchannel_msgs(debug=False, force=False):
     b = vim.current.buffer
     update_occured = False
     for m in msgs:
-        #db.append(str(m).splitlines())
         s = ''
         if 'msg_type' not in m['header']:
             # debug information
