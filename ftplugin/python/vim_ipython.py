@@ -82,16 +82,21 @@ instance with which you communicate via vim-ipython needs to be running the
 same version of Python.
 """
 
-def new_ipy():
-    from random import random
-    from subprocess import Popen, PIPE
-    from time import sleep
-    import atexit
-    fname = "vim.ipython.%s.json" % (int(random()*100000))
-    p = Popen(["ipython", "kernel", "-f", fname], shell=False, stdout=PIPE, stdin=PIPE, stderr=PIPE)
-    atexit.register(p.kill)
-    sleep(3)
-    return km_from_string(fname)
+def new_ipy(s=''):
+    """Create a new IPython kernel (optionally with extra arguments)
+
+    XXX: Allow passing of profile information here
+
+    Examples
+    --------
+
+        new_ipy()
+
+    """
+    from IPython.kernel import KernelManager
+    km = KernelManager()
+    km.start_kernel()
+    return km_from_string(km.connection_file)
 
 def km_from_string(s=''):
     """create kernel manager from IPKernelApp string
