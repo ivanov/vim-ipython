@@ -1,0 +1,37 @@
+Given ():
+  Hello
+
+Execute python ( check Python support ):
+  import os
+  import vim
+  from vim import current, vars
+  vim.command('normal! yy2p')
+  current.buffer.append(os.path.basename(vars['vader_file']))
+
+Expect:
+  Hello
+  Hello
+  Hello
+  simple.vader
+
+
+Execute python (check IPython import):
+  import vim
+  from vim import current, vars
+  import IPython
+  current.buffer.append(str(IPython.version_info[0] >= 1))
+
+Expect:
+  Hello
+  True
+
+Execute python (check vim_ipython import):
+  import vim
+  vim.command("set ft=python")
+  vim.command("IPython")
+  import vim_ipython
+  current.buffer.append("vim_ipython loaded")
+
+Expect:
+  Hello
+  vim_ipython loaded
