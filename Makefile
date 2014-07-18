@@ -8,4 +8,8 @@ test:
 		-c 'echo "    git clone https://github.com/junegunn/vader.vim.git ~/.vim/bundle/vader.vim"'\
 		-c 'exit endif'
 
+testci:
+	# Continuous integration services clone Vader local to this directory
+	vim -N -u .test.vimrc -c 'Vader test/*'
+
 .PHONY: test
