@@ -2,14 +2,18 @@ language: vim
 
 before_script: |
   sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
-  sudo add-apt-repository -y ppa:nmi/vim-snapshots
-  sudo apt-get update
-  sudo apt-get install vim ipython libzmq-dev
+  sudo apt-get install ipython libzmq-dev python-dev
   sudo easy_install -q pyzmq
   git clone https://github.com/junegunn/vader.vim.git
+  hg clone https://code.google.com/p/vim/
+  cd vim
+  ./configure --with-features=huge --enable-pythoninterp
+  make
+  sudo make install
+  cd -
 
 script: |
-  vim -Nu <(cat << VIMRC
+  /usr/local/bin/vim -Nu <(cat << VIMRC
   filetype off
   set rtp+=vader.vim
   set rtp+=.
