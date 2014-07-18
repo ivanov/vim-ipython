@@ -5,11 +5,12 @@ before_script: |
   sudo apt-get install vim-nox ipython libzmq-dev
   sudo easy_install -q pyzmq
   git clone https://github.com/junegunn/vader.vim.git
+
+script: |
   echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
   vim  -c "echo has('python')" -c "quit"
   echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-
-script: |
+  vim  -c "python import os; print os.__file__" -c "quit"
   vim -Nu <(cat << VIMRC
   filetype off
   set rtp+=vader.vim
