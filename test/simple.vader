@@ -1,6 +1,14 @@
 Given ():
   Hello
 
+Do ( check basic Vim support ):
+  yy2p
+  
+Expect:
+  Hello
+  Hello
+  Hello
+
 Execute python ( check Python support ):
   import os
   import vim
