@@ -2,7 +2,8 @@ language: vim
 
 before_script: |
   git clone https://github.com/junegunn/vader.vim.git
-  sudo apt-get install vim-nox ipython python-zmq
+  sudo easy_install -q pyzmq
+  sudo apt-get install vim-nox ipython
 
 script: |
   vim -Nu <(cat << VIMRC
