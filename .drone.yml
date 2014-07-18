@@ -1,0 +1,5 @@
+image: ivanov/vim-ipython
+scripts:
+    - git clone https://github.com/junegunn/vader.vim.git
+    - make testci
+    - echo "finished commands from .drone.yml"
