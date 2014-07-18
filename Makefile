@@ -10,6 +10,6 @@ test:
 
 testci:
 	# Continuous integration services clone Vader local to this directory
-	vim -N -u .test.vimrc -c 'Vader test/*'
+	vim -N -u .test.vimrc -c 'Vader! test/*'
 
 .PHONY: test
