@@ -40,3 +40,16 @@ This is a list of things I'm planning to work on with vim-ipython
 
 
 [ ] support profiledir
+
+docker for vim
+    - built against python3
+    - built against python2
+
+test for python support in vim test suite
+
+- vim test suite using:
+    vader: https://github.com/junegunn/vader.vim
+
+    https://github.com/lukaszb/vimmock
+
+    https://github.com/AndrewRadev/vimrunner

@@ -11,6 +11,7 @@ before_script: |
   make
   sudo make install
   cd -
+  sudo pip install -U ipython
 
 script: |
   /usr/local/bin/vim -Nu <(cat << VIMRC
