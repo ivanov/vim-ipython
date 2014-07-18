@@ -1,4 +1,4 @@
-language: vim
+language: python
 
 before_script: |
   sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
@@ -10,6 +10,7 @@ script: |
   echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
   vim  -c "echo has('python')" -c "quit"
   echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  python --version
   vim  -c "python import os; print os.__file__" -c "quit"
   vim -Nu <(cat << VIMRC
   filetype off
