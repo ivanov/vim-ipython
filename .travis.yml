@@ -1,17 +1,24 @@
-language: python
+language: vim
 
 before_script: |
-  sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
-  sudo apt-get install vim-nox ipython libzmq-dev
-  sudo easy_install -q pyzmq
-  git clone https://github.com/junegunn/vader.vim.git
-  echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-  vim  -c "echo has('python')" -c "quit"
-  echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-  python --version
+    # sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
+    # sudo apt-get install vim-nox ipython libzmq-dev
+    # sudo easy_install -q pyzmq
+    # git clone https://github.com/junegunn/vader.vim.git
+    # echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    # vim  -c "echo has('python')" -c "quit"
+    # echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    # python --version
+    hg clone https://code.google.com/p/vim/
+    cd vim
+    ./configure --with-features=huge --enable-rubyinterp --enable-pythoninterp
+    make
+    sudo make install
+    cd -
+    git clone https://github.com/junegunn/vader.vim.git
 
 script: |
-  vim -Nu <(cat << VIMRC
+  /usr/local/bin/vim -Nu <(cat << VIMRC
   filetype off
   set rtp+=vader.vim
   set rtp+=.
