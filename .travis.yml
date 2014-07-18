@@ -11,12 +11,9 @@ before_script: |
   python --version
 
 script: |
-  vim  -c "python import os; print os.__file__" -c "quit"
-  #vim -Nu <(cat << VIMRC
-  #filetype off
-  #set rtp+=vader.vim
-  #set rtp+=.
-  #set rtp+=after
-  #filetype plugin indent on
-  #VIMRC) -c 'Vader! test/*'
-  # > /dev/null
+  vim -Nu <(cat << VIMRC
+  filetype off
+  set rtp+=vader.vim
+  set rtp+=.
+  filetype plugin indent on
+  VIMRC) -c 'Vader! test/*' > /dev/null
