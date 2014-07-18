@@ -1,9 +1,13 @@
 language: vim
 
 before_script: |
-  git clone https://github.com/junegunn/vader.vim.git
+  sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm
+  sudo apt-get install vim-nox ipython libzmq-dev
   sudo easy_install -q pyzmq
-  sudo apt-get install vim-nox ipython
+  git clone https://github.com/junegunn/vader.vim.git
+  echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  vim  -c "echo has('python')" -c "quit"
+  echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 script: |
   vim -Nu <(cat << VIMRC
