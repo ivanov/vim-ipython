@@ -296,6 +296,7 @@ pull request with your attribution.
 
 Similar Projects
 ----------------
+* `ipython-vimception`_ - vim-within-vim in the IPython Notebook (Paul Ivanov)
 * `vim-slime`_ - Grab some text and "send" it to a GNU Screen / tmux session
   (Jonathan Palardy)
 * `screen.vba`_ - Simulate a split shell, using GNU Screen / tmux, that you
@@ -311,6 +312,7 @@ Similar Projects
   different direction. (John David Giese)
 
 
+.. _ipython-vimception: https://github.com/ivanov/ipython-vimception
 .. _vim-slime: https://github.com/jpalardy/vim-slime
 .. _screen.vba: https://github.com/ervandew/screen
 .. _conque: http://code.google.com/p/conque/
