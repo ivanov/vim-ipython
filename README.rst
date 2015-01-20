@@ -153,7 +153,7 @@ not work on Windows, please report the issue to ).
 -------
 Options
 -------
-You can change these at the top of the ipy.vim::
+You can change these at the top of the vim_ipython.py::
 
   reselect = False            # reselect lines after sending from Visual mode
   show_execution_count = True # wait to get numbers for In[43]: feedback?
