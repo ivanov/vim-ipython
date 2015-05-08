@@ -247,6 +247,16 @@ def get_doc_msg(msg_id):
     if not content['found']:
         return b
 
+    # IPython 3.0+ the documentation message is encoding by the kernel
+    if 'data' in content:
+        try:
+            text = content['data']['text/plain']
+            for line in text.split('\n'):
+                b.append(strip_color_escapes(line).rstrip())
+            return b
+        except KeyError:    # no text/plain key
+            return b
+
     for field in ['type_name','base_class','string_form','namespace',
             'file','length','definition','source','docstring']:
         c = content.get(field,None)
