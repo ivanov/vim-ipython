@@ -310,7 +310,10 @@ def get_doc_buffer(level=0):
         vim.command('setlocal syntax=python')
 
 def ipy_complete(base, current_line, pos):
-    msg_id = kc.shell_channel.complete(base, current_line, len(current_line))
+    # pos is the location of the start of base, add the length
+    # to get the completion position
+    msg_id = kc.shell_channel.complete(base, current_line,
+                                       int(pos) + len(base) - 1)
     try:
         m = get_child_msg(msg_id)
         matches = m['content']['matches']
