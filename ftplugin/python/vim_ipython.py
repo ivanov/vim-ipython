@@ -172,17 +172,25 @@ def km_from_string(s=''):
         # 0.13
         kc = km
     kc.start_channels()
-    send = kc.shell_channel.execute
+
+    try:
+        send = kc.execute
+    except AttributeError:
+        # < 3.0
+        send = kc.shell_channel.execute
 
     #XXX: backwards compatibility for IPython < 0.13
-    import inspect
-    sc = kc.shell_channel
-    num_oinfo_args = len(inspect.getargspec(sc.object_info).args)
-    if num_oinfo_args == 2:
-        # patch the object_info method which used to only take one argument
-        klass = sc.__class__
-        klass._oinfo_orig = klass.object_info
-        klass.object_info = lambda s,x,y: s._oinfo_orig(x)
+    try:
+        import inspect
+        sc = kc.shell_channel
+        num_oinfo_args = len(inspect.getargspec(sc.object_info).args)
+        if num_oinfo_args == 2:
+            # patch the object_info method which used to only take one argument
+            klass = sc.__class__
+            klass._oinfo_orig = klass.object_info
+            klass.object_info = lambda s,x,y: s._oinfo_orig(x)
+    except:
+        pass
 
     #XXX: backwards compatibility for IPython < 1.0
     if not hasattr(kc, 'iopub_channel'):
@@ -569,7 +577,12 @@ def set_pid():
     """
     global pid
     lines = '\n'.join(['import os', '_pid = os.getpid()'])
-    msg_id = send(lines, silent=True, user_variables=['_pid'])
+
+    try:
+        msg_id = send(lines, silent=True, user_variables=['_pid'])
+    except TypeError: # change in IPython 3.0+
+        msg_id = send(lines, silent=True, user_expressions={'_pid':'_pid'})
+
     # wait to get message back from kernel
     try:
         child = get_child_msg(msg_id)
